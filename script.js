@@ -1,362 +1,8 @@
+let hp = 100
+
+let attackInterval
+
 const wordsArray = [
-  "the",
-  "of",
-  "to",
-  "and",
-  "a",
-  "in",
-  "is",
-  "it",
-  "you",
-  "that",
-  "he",
-  "was",
-  "for",
-  "on",
-  "are",
-  "with",
-  "as",
-  "I",
-  "his",
-  "they",
-  "be",
-  "at",
-  "one",
-  "have",
-  "this",
-  "from",
-  "or",
-  "had",
-  "by",
-  "hot",
-  "but",
-  "some",
-  "what",
-  "there",
-  "we",
-  "can",
-  "out",
-  "other",
-  "were",
-  "all",
-  "your",
-  "when",
-  "up",
-  "use",
-  "word",
-  "how",
-  "said",
-  "an",
-  "each",
-  "she",
-  "which",
-  "do",
-  "their",
-  "time",
-  "if",
-  "will",
-  "way",
-  "about",
-  "many",
-  "then",
-  "them",
-  "would",
-  "write",
-  "like",
-  "so",
-  "these",
-  "her",
-  "long",
-  "make",
-  "thing",
-  "see",
-  "him",
-  "two",
-  "has",
-  "look",
-  "more",
-  "day",
-  "could",
-  "go",
-  "come",
-  "did",
-  "my",
-  "sound",
-  "no",
-  "most",
-  "number",
-  "who",
-  "over",
-  "know",
-  "water",
-  "than",
-  "call",
-  "first",
-  "people",
-  "may",
-  "down",
-  "side",
-  "been",
-  "now",
-  "find",
-  "any",
-  "new",
-  "work",
-  "part",
-  "take",
-  "get",
-  "place",
-  "made",
-  "live",
-  "where",
-  "after",
-  "back",
-  "little",
-  "only",
-  "round",
-  "man",
-  "year",
-  "came",
-  "show",
-  "every",
-  "good",
-  "me",
-  "give",
-  "our",
-  "under",
-  "name",
-  "very",
-  "through",
-  "just",
-  "form",
-  "much",
-  "great",
-  "think",
-  "say",
-  "help",
-  "low",
-  "line",
-  "before",
-  "turn",
-  "cause",
-  "same",
-  "mean",
-  "differ",
-  "move",
-  "right",
-  "boy",
-  "old",
-  "too",
-  "does",
-  "tell",
-  "sentence",
-  "set",
-  "three",
-  "want",
-  "air",
-  "well",
-  "also",
-  "play",
-  "small",
-  "end",
-  "put",
-  "home",
-  "read",
-  "hand",
-  "port",
-  "large",
-  "spell",
-  "add",
-  "even",
-  "land",
-  "here",
-  "must",
-  "big",
-  "high",
-  "such",
-  "follow",
-  "act",
-  "why",
-  "ask",
-  "men",
-  "change",
-  "went",
-  "light",
-  "kind",
-  "off",
-  "need",
-  "house",
-  "picture",
-  "try",
-  "us",
-  "again",
-  "animal",
-  "point",
-  "mother",
-  "world",
-  "near",
-  "build",
-  "self",
-  "earth",
-  "father",
-  "head",
-  "stand",
-  "own",
-  "page",
-  "should",
-  "country",
-  "found",
-  "answer",
-  "school",
-  "grow",
-  "study",
-  "still",
-  "learn",
-  "plant",
-  "cover",
-  "food",
-  "sun",
-  "four",
-  "thought",
-  "let",
-  "keep",
-  "eye",
-  "never",
-  "last",
-  "door",
-  "between",
-  "city",
-  "tree",
-  "cross",
-  "since",
-  "hard",
-  "start",
-  "might",
-  "story",
-  "saw",
-  "far",
-  "sea",
-  "draw",
-  "left",
-  "late",
-  "run",
-  "don't",
-  "while",
-  "press",
-  "close",
-  "night",
-  "real",
-  "life",
-  "few",
-  "stop",
-  "open",
-  "seem",
-  "together",
-  "next",
-  "white",
-  "children",
-  "begin",
-  "got",
-  "walk",
-  "example",
-  "ease",
-  "paper",
-  "often",
-  "always",
-  "music",
-  "those",
-  "both",
-  "mark",
-  "book",
-  "letter",
-  "until",
-  "mile",
-  "river",
-  "car",
-  "feet",
-  "care",
-  "second",
-  "group",
-  "carry",
-  "took",
-  "rain",
-  "eat",
-  "room",
-  "friend",
-  "began",
-  "idea",
-  "fish",
-  "mountain",
-  "north",
-  "once",
-  "base",
-  "hear",
-  "horse",
-  "cut",
-  "sure",
-  "watch",
-  "color",
-  "face",
-  "wood",
-  "main",
-  "enough",
-  "plain",
-  "girl",
-  "usual",
-  "young",
-  "ready",
-  "above",
-  "ever",
-  "red",
-  "list",
-  "though",
-  "feel",
-  "talk",
-  "bird",
-  "soon",
-  "body",
-  "dog",
-  "family",
-  "direct",
-  "pose",
-  "leave",
-  "song",
-  "measure",
-  "state",
-  "product",
-  "black",
-  "short",
-  "numeral",
-  "class",
-  "wind",
-  "question",
-  "happen",
-  "complete",
-  "ship",
-  "area",
-  "half",
-  "rock",
-  "order",
-  "fire",
-  "south",
-  "problem",
-  "piece",
-  "told",
-  "knew",
-  "pass",
-  "farm",
-  "top",
-  "whole",
-  "king",
-  "size",
-  "heard",
-  "best",
-  "hour",
-  "better",
-  "TRUE",
-  "during",
-  "hundred",
-  "am",
   "remember",
   "step",
   "early",
@@ -378,130 +24,8 @@ const wordsArray = [
   "simple",
   "several",
   "vowel",
-  "toward",
-  "war",
-  "lay",
-  "against",
-  "pattern",
-  "slow",
-  "center",
-  "love",
-  "person",
-  "money",
-  "serve",
-  "appear",
-  "road",
-  "map",
-  "science",
-  "rule",
-  "govern",
-  "pull",
-  "cold",
-  "notice",
-  "voice",
-  "fall",
-  "power",
-  "town",
-  "fine",
-  "certain",
-  "fly",
-  "unit",
-  "lead",
-  "cry",
-  "dark",
-  "machine",
-  "note",
-  "wait",
-  "plan",
-  "figure",
-  "star",
-  "box",
-  "noun",
-  "field",
-  "rest",
-  "correct",
-  "able",
-  "pound",
-  "done",
-  "beauty",
-  "drive",
-  "stood",
-  "contain",
-  "front",
-  "teach",
-  "week",
-  "final",
-  "gave",
-  "green",
-  "oh",
-  "quick",
-  "develop",
-  "sleep",
-  "warm",
-  "free",
-  "minute",
-  "strong",
-  "special",
-  "mind",
-  "behind",
-  "clear",
-  "tail",
-  "produce",
-  "fact",
-  "street",
-  "inch",
-  "lot",
-  "nothing",
-  "course",
-  "stay",
-  "wheel",
-  "full",
-  "force",
-  "blue",
-  "object",
-  "decide",
-  "surface",
-  "deep",
-  "moon",
-  "island",
-  "foot",
-  "yet",
-  "busy",
-  "test",
-  "record",
-  "boat",
-  "common",
-  "gold",
-  "possible",
-  "plane",
-  "age",
-  "dry",
-  "wonder",
-  "laugh",
-  "thousand",
-  "ago",
-  "ran",
-  "check",
-  "game",
-  "shape",
-  "yes",
-  "hot",
-  "miss",
-  "brought",
-  "heat",
-  "snow",
-  "bed",
-  "bring",
-  "sit",
-  "perhaps",
-  "fill",
-  "east",
-  "weight",
-  "language",
-  "among",
 ]
 
-// Return an array with a specified number of random words
 function getRandomWords(numWords) {
   const selectedWords = []
 
@@ -513,7 +37,7 @@ function getRandomWords(numWords) {
   return selectedWords
 }
 
-let words = getRandomWords(5)
+let words = getRandomWords(2)
 let currentWord = words[0] // The word to type (for testing purposes)
 let currentInputIndex = 0 // Tracks the current character input index
 let wordsTyped = 0
@@ -532,14 +56,13 @@ function createParallaxLayer(imageSrc, speed, canvasWidth, canvasHeight) {
     canvasHeight: canvasHeight,
     x1: 0,
     x2: canvasWidth,
-    isMoving: true, // New property to control movement
+    isMoving: true,
   }
 
   layer.image.src = imageSrc
 
   layer.update = function () {
     if (this.isMoving) {
-      // Only update position if moving
       this.x1 -= this.speed
       this.x2 -= this.speed
 
@@ -573,17 +96,96 @@ function createParallaxLayer(imageSrc, speed, canvasWidth, canvasHeight) {
   return layer
 }
 
+const monsters = [
+  {
+    type: "Skeleton",
+    walkColSize: 4,
+    idleColSize: 4,
+    hitColSize: 4,
+    deathColSize: 4,
+    attackColSize: 9,
+    attack: { dmg: 5, time: 5000 },
+  },
+  {
+    type: "Goblin",
+    walkColSize: 8,
+    idleColSize: 4,
+    hitColSize: 4,
+    deathColSize: 4,
+    attackColSize: 9,
+    attack: { dmg: 2, time: 2000 },
+  },
+  {
+    type: "Mushroom",
+    walkColSize: 8,
+    idleColSize: 4,
+    hitColSize: 4,
+    deathColSize: 4,
+    attackColSize: 9,
+    attack: { dmg: 2, time: 2000 },
+  },
+]
+
+let currentMonster = monsters[Math.floor(Math.random() * monsters.length)]
+
+function createNewMonster() {
+  currentMonster = monsters[Math.floor(Math.random() * monsters.length)]
+  spriteAnimation = createSpriteAnimation({
+    canvas: spriteAnimation.canvas,
+    scale: 4,
+    monster: currentMonster,
+    onWalkComplete: spriteAnimation.onWalkComplete,
+    onStateChange: spriteAnimation.onStateChange,
+  })
+
+  initiateAttackSequence()
+}
+
+function initiateAttackSequence() {
+  if (attackInterval) clearInterval(attackInterval)
+
+  attackInterval = setInterval(() => {
+    spriteAnimation.changeState("attack")
+
+    hp -= currentMonster.attack.dmg
+    console.log(`Attacked! HP remaining: ${hp}`)
+
+    if (hp <= 0) {
+      hp = 100
+      console.log("Game Over!")
+      clearInterval(attackInterval)
+    }
+  }, currentMonster.attack.time)
+}
+
 function createSpriteAnimation(options) {
   const animation = {
-    walkImage: new Image(),
-    idleImage: new Image(),
-    deathImage: new Image(),
+    walk: {
+      image: new Image(),
+      cols: options.monster.walkColSize,
+    },
+    idle: {
+      image: new Image(),
+      cols: options.monster.idleColSize,
+    },
+    hit: {
+      image: new Image(),
+      cols: options.monster.hitColSize,
+    },
+    death: {
+      image: new Image(),
+      cols: options.monster.deathColSize,
+    },
+    attack: {
+      image: new Image(),
+      cols: options.monster.attackColSize,
+    },
     currentImage: null,
-    cols: options.cols || 4,
+    cols: options.monster.walkColSize || 4,
     scale: options.scale || 4,
     canvas: options.canvas,
     ctx: options.canvas.getContext("2d"),
-    monsterType: options.monsterType,
+    monsterType: options.monster.type,
     currentFrame: 0,
     framesDrawn: 0,
     position: {
@@ -595,19 +197,19 @@ function createSpriteAnimation(options) {
     stateTime: 0,
     walkDuration: 500,
     cycleStartTime: 0,
-    onStateChange: options.onStateChange || (() => {}), // Callback for state changes
-    onWalkComplete: options.onWalkComplete || (() => {}), // Callback when walking is complete
+    onStateChange: options.onStateChange || (() => {}),
+    onWalkComplete: options.onWalkComplete || (() => {}),
   }
 
-  animation.walkImage.src = `sprites/${animation.monsterType}/Walk.png`
-  animation.idleImage.src = `sprites/${animation.monsterType}/Idle.png`
-  animation.deathImage.src = `sprites/${animation.monsterType}/Death.png`
-  animation.currentImage = animation.walkImage
+  animation.walk.image.src = `sprites/${animation.monsterType}/Walk.png`
+  animation.idle.image.src = `sprites/${animation.monsterType}/Idle.png`
+  animation.hit.image.src = `sprites/${animation.monsterType}/Take_Hit.png`
+  animation.death.image.src = `sprites/${animation.monsterType}/Death.png`
+  animation.attack.image.src = `sprites/${animation.monsterType}/Attack.png`
 
-  animation.walkImage.onload = () => {
-    animation.spriteWidth = animation.walkImage.width / animation.cols
-    animation.spriteHeight = animation.walkImage.height
-  }
+  animation.currentImage = animation.walk.image
+  animation.spriteWidth = animation.currentImage.width / animation.cols
+  animation.spriteHeight = animation.currentImage.height
 
   animation.update = function (currentTime) {
     if (!animation.cycleStartTime) {
@@ -615,41 +217,52 @@ function createSpriteAnimation(options) {
     }
 
     const cycleTime = currentTime - animation.cycleStartTime
-    const previousState = animation.state
 
-    if (animation.state === "death") {
-      animation.currentImage = animation.deathImage
-      if (animation.currentFrame === animation.cols - 1) {
-        animation.state = "hidden"
-        animation.reset()
-        animation.currentImage = animation.walkImage
-      }
-    } else if (cycleTime < 500) {
-      animation.state = "hidden"
-      animation.position.x = 1.2
-    } else if (cycleTime < 1000) {
-      animation.state = "walking"
-      animation.currentImage = animation.walkImage
-      const walkProgress = (cycleTime - 500) / animation.walkDuration
-      animation.position.x = 1.2 - 0.3 * walkProgress
-    } else if (cycleTime < 2000) {
-      animation.state = "idle"
-      animation.currentImage = animation.idleImage
-      animation.position.x = 0.9
-      if (previousState !== animation.state) {
-        animation.onWalkComplete() // Call the callback to show words
-      }
-    }
-
-    // Notify state change
-    if (previousState !== animation.state) {
-      animation.onStateChange(animation.state)
-    }
-
+    // Frame advancement logic
     this.framesDrawn++
     if (this.framesDrawn >= 15) {
       this.currentFrame = (this.currentFrame + 1) % this.cols
       this.framesDrawn = 0
+    }
+
+    // Death state: play death animation once
+    if (animation.state === "death") {
+      if (animation.currentFrame === animation.cols - 1) {
+        this.reset()
+        this.changeState("hidden")
+        createNewMonster()
+      }
+    }
+    // Attack state: play attack animation once
+    else if (animation.state === "attack") {
+      if (animation.currentFrame === animation.cols - 1) {
+        this.changeState("idle") // Return to idle after attack
+        this.refresh()
+      }
+    }
+    // Hit state: play hit animation once and switch back to idle
+    else if (animation.state === "hit") {
+      if (animation.currentFrame === animation.cols - 1) {
+        this.changeState("idle")
+      }
+    }
+    // Walking state logic
+    else if (cycleTime < 500) {
+      this.position.x = 1.2
+      this.changeState("hidden")
+    } else if (cycleTime < 1000) {
+      this.changeState("walk")
+      const walkProgress = (cycleTime - 500) / animation.walkDuration
+      animation.position.x = 1.2 - 0.3 * walkProgress
+    }
+    // Idle state logic
+    else if (cycleTime < 2000) {
+      let previousState = this.state
+      this.changeState("idle")
+      animation.position.x = 0.9
+      if (previousState !== this.state) {
+        animation.onWalkComplete()
+      }
     }
   }
 
@@ -682,7 +295,54 @@ function createSpriteAnimation(options) {
   }
 
   animation.reset = function () {
-    animation.cycleStartTime = 0
+    this.framesDrawn = 0
+    this.currentFrame = 0
+    this.cycleStartTime = 0
+  }
+
+  animation.refresh = function () {
+    this.framesDrawn = 0
+    this.currentFrame = 0
+  }
+
+  animation.changeState = function (state) {
+    if (this.state === state) return
+
+    this.state = state
+    switch (state) {
+      case "walk":
+        this.currentImage = this.walk.image
+        this.cols = this.walk.cols
+        break
+      case "idle":
+        this.currentImage = this.idle.image
+        this.cols = this.idle.cols
+        break
+      case "hit":
+        this.currentImage = this.hit.image
+        this.cols = this.hit.cols
+        this.refresh()
+        break
+      case "death":
+        this.currentImage = this.death.image
+        this.cols = this.death.cols
+        this.reset()
+        break
+      case "attack":
+        this.currentImage = this.attack.image
+        this.cols = this.attack.cols
+        this.refresh()
+        break
+      case "hidden":
+        this.currentImage = this.walk.image
+        this.cols = this.walk.cols
+        break
+    }
+
+    this.spriteWidth = this.currentImage.width / this.cols
+    this.spriteHeight = this.currentImage.height
+
+    this.onStateChange(this.state)
   }
 
   return animation
@@ -692,17 +352,17 @@ function createWordDisplay() {
   const wordDisplay = document.createElement("div")
   wordDisplay.id = "wordDisplay"
   wordDisplay.style.position = "absolute"
-  wordDisplay.style.top = "20px" // Adjust as needed
+  wordDisplay.style.top = "20px"
   wordDisplay.style.left = "50%"
   wordDisplay.style.transform = "translateX(-50%)"
-  wordDisplay.style.fontSize = "24px" // Adjust as needed
-  wordDisplay.style.color = "white" // Adjust color for visibility
+  wordDisplay.style.fontSize = "24px"
+  wordDisplay.style.color = "white"
 
   currentWord.split("").forEach((char) => {
     const charSpan = document.createElement("span")
     charSpan.innerText = char
-    charSpan.style.backgroundColor = "transparent" // Initial background
-    charSpan.style.transition = "background-color 0.3s" // Smooth transition
+    charSpan.style.backgroundColor = "transparent"
+    charSpan.style.transition = "background-color 0.3s"
     wordDisplay.appendChild(charSpan)
   })
 
@@ -714,9 +374,9 @@ function updateWordDisplay() {
   const spans = document.querySelectorAll("#wordDisplay span")
   spans.forEach((span, index) => {
     if (index < currentInputIndex) {
-      span.style.backgroundColor = "green" // Correctly typed character
+      span.style.backgroundColor = "green"
     } else {
-      span.style.backgroundColor = "transparent" // Reset color for untyped characters
+      span.style.backgroundColor = "transparent"
     }
   })
 }
@@ -727,37 +387,37 @@ function handleKeyPress(event) {
     currentInputIndex++
     updateWordDisplay()
 
-    // Check if the word is completely typed
     if (currentInputIndex === currentWord.length) {
       currentInputIndex = 0 // Reset for next word
       wordsTyped++
 
       if (wordsTyped === words.length) {
-        spriteAnimation.state = "death"
-        spriteAnimation.cycleStartTime = 0
+        spriteAnimation.changeState("death")
         wordsTyped = 0
         currentInputIndex = 0
-        loadRandomWords(5)
+        loadRandomWords(2)
         currentWord = words[wordsTyped]
         resetWordContainer()
+        return
       } else {
         currentWord = words[wordsTyped]
         showNewWord()
       }
+      spriteAnimation.changeState("hit")
     }
   }
 }
 
 function resetWordContainer() {
   const wordContainer = document.getElementById("wordContainer")
-  wordContainer.innerHTML = "" // Clear the current display
+  wordContainer.innerHTML = ""
 }
 
 function showNewWord() {
   const wordContainer = document.getElementById("wordContainer")
-  wordContainer.innerHTML = "" // Clear the current display
+  wordContainer.innerHTML = ""
 
-  createWordDisplay() // Recreate the display for the new word
+  createWordDisplay()
 }
 
 function ParallaxScene() {
@@ -792,27 +452,22 @@ function ParallaxScene() {
     ),
   ]
 
-  // Create sprite animation with state change handler
   spriteAnimation = createSpriteAnimation({
     canvas: canvas,
-    cols: 4,
     scale: 4,
-    monsterType: "Skeleton",
+    monster: currentMonster,
     onStateChange: (newState) => {
-      // Stop parallax movement when skeleton enters idle state
       if (newState === "idle") {
         layers.forEach((layer) => {
           layer.isMoving = false
         })
-      }
-      // Resume parallax movement when skeleton is hidden (cycle restart)
-      else if (newState === "hidden") {
+      } else if (newState === "hidden") {
         layers.forEach((layer) => {
           layer.isMoving = true
         })
       }
     },
-    onWalkComplete: createWordDisplay, // Show words after walking, // Callback when walking is complete
+    onWalkComplete: createWordDisplay,
   })
 
   function resize() {
@@ -845,8 +500,8 @@ function ParallaxScene() {
   resize()
   requestAnimationFrame(animate)
 }
-
 document.addEventListener("DOMContentLoaded", () => {
   ParallaxScene()
-  window.addEventListener("keypress", handleKeyPress) // Add the keypress event listener
+  initiateAttackSequence()
+  window.addEventListener("keypress", handleKeyPress)
 })
