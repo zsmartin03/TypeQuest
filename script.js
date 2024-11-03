@@ -326,6 +326,7 @@ function createSpriteAnimation(options) {
       case "death":
         this.currentImage = this.death.image
         this.cols = this.death.cols
+        clearInterval(attackInterval)
         this.reset()
         break
       case "attack":
@@ -355,19 +356,42 @@ function createWordDisplay() {
   wordDisplay.style.top = "20px"
   wordDisplay.style.left = "50%"
   wordDisplay.style.transform = "translateX(-50%)"
-  wordDisplay.style.fontSize = "24px"
+  wordDisplay.style.fontFamily = "MedievalSharp"
+  wordDisplay.style.fontSize = "34px"
   wordDisplay.style.color = "white"
+  wordDisplay.style.backgroundColor = "#27221b"
+  wordDisplay.style.padding = "6px" // Adds space for the pixel effect
+  wordDisplay.style.borderRadius = "2px"
+  wordDisplay.style.boxShadow = `
+    0px 0px 0px 2px #3d3327,   /* Outer layer for the pixelated effect */
+    -2px -2px 0px 2px #3d3327,
+    2px -2px 0px 2px #3d3327,
+    -2px 2px 0px 2px #3d3327,
+    2px 2px 0px 2px #3d3327,
+    -4px -4px 0px 2px #1c1714, /* Inner layer with darker shade */
+    4px -4px 0px 2px #1c1714,
+    -4px 4px 0px 2px #1c1714,
+    4px 4px 0px 2px #1c1714
+  `
 
   currentWord.split("").forEach((char) => {
     const charSpan = document.createElement("span")
     charSpan.innerText = char
     charSpan.style.backgroundColor = "transparent"
-    charSpan.style.transition = "background-color 0.3s"
+    charSpan.style.transition = "background-color 0.1s"
     wordDisplay.appendChild(charSpan)
   })
 
   const wordContainer = document.getElementById("wordContainer")
   wordContainer.appendChild(wordDisplay)
+
+  const monsterX = 0.25 * spriteAnimation.canvas.width
+  const monsterY = 1.05 * spriteAnimation.canvas.height
+
+  wordDisplay.style.left = `${monsterX - wordDisplay.offsetWidth / 2}px`
+  wordDisplay.style.top = `${
+    monsterY - spriteAnimation.spriteHeight * spriteAnimation.scale - 20
+  }px` // 20px above the monster
 }
 
 function updateWordDisplay() {
