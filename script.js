@@ -1,4 +1,8 @@
+let spriteAnimation = {}
+let player = {}
 let hp = 100
+
+const hpBar = createHPBar()
 
 let attackInterval
 
@@ -26,6 +30,41 @@ const wordsArray = [
   "vowel",
 ]
 
+const monsters = [
+  {
+    type: "Skeleton",
+    walkColSize: 4,
+    idleColSize: 4,
+    hitColSize: 4,
+    deathColSize: 4,
+    attackColSize: 9,
+    attack: { dmg: 5, time: 5000 },
+    requiredWords: 5,
+  },
+  {
+    type: "Goblin",
+    walkColSize: 8,
+    idleColSize: 4,
+    hitColSize: 4,
+    deathColSize: 4,
+    attackColSize: 9,
+    attack: { dmg: 2, time: 2000 },
+    requiredWords: 3,
+  },
+  {
+    type: "Mushroom",
+    walkColSize: 8,
+    idleColSize: 4,
+    hitColSize: 4,
+    deathColSize: 4,
+    attackColSize: 9,
+    attack: { dmg: 2, time: 2000 },
+    requiredWords: 2,
+  },
+]
+
+let currentMonster = monsters[Math.floor(Math.random() * monsters.length)]
+
 function getRandomWords(numWords) {
   const selectedWords = []
 
@@ -37,16 +76,10 @@ function getRandomWords(numWords) {
   return selectedWords
 }
 
-let words = getRandomWords(2)
-let currentWord = words[0] // The word to type (for testing purposes)
-let currentInputIndex = 0 // Tracks the current character input index
+let words = getRandomWords(currentMonster.requiredWords)
+let currentWord = words[0]
+let currentInputIndex = 0
 let wordsTyped = 0
-
-let spriteAnimation = {}
-
-function loadRandomWords(wordCount) {
-  words = getRandomWords(wordCount)
-}
 
 function createParallaxLayer(imageSrc, speed, canvasWidth, canvasHeight) {
   const layer = {
@@ -96,43 +129,13 @@ function createParallaxLayer(imageSrc, speed, canvasWidth, canvasHeight) {
   return layer
 }
 
-const monsters = [
-  {
-    type: "Skeleton",
-    walkColSize: 4,
-    idleColSize: 4,
-    hitColSize: 4,
-    deathColSize: 4,
-    attackColSize: 9,
-    attack: { dmg: 5, time: 5000 },
-  },
-  {
-    type: "Goblin",
-    walkColSize: 8,
-    idleColSize: 4,
-    hitColSize: 4,
-    deathColSize: 4,
-    attackColSize: 9,
-    attack: { dmg: 2, time: 2000 },
-  },
-  {
-    type: "Mushroom",
-    walkColSize: 8,
-    idleColSize: 4,
-    hitColSize: 4,
-    deathColSize: 4,
-    attackColSize: 9,
-    attack: { dmg: 2, time: 2000 },
-  },
-]
-
-let currentMonster = monsters[Math.floor(Math.random() * monsters.length)]
-
 function createNewMonster() {
   currentMonster = monsters[Math.floor(Math.random() * monsters.length)]
+  words = getRandomWords(currentMonster.requiredWords)
+
   spriteAnimation = createSpriteAnimation({
     canvas: spriteAnimation.canvas,
-    scale: 4,
+    scale: 5,
     monster: currentMonster,
     onWalkComplete: spriteAnimation.onWalkComplete,
     onStateChange: spriteAnimation.onStateChange,
@@ -141,20 +144,14 @@ function createNewMonster() {
   initiateAttackSequence()
 }
 
+let attackInProgress = false
+
 function initiateAttackSequence() {
   if (attackInterval) clearInterval(attackInterval)
 
   attackInterval = setInterval(() => {
     spriteAnimation.changeState("attack")
-
-    hp -= currentMonster.attack.dmg
-    console.log(`Attacked! HP remaining: ${hp}`)
-
-    if (hp <= 0) {
-      hp = 100
-      console.log("Game Over!")
-      clearInterval(attackInterval)
-    }
+    attackInProgress = true
   }, currentMonster.attack.time)
 }
 
@@ -191,7 +188,7 @@ function createSpriteAnimation(options) {
     position: {
       x: 1.2,
       y: 1,
-      offsetY: 50,
+      offsetY: 15,
     },
     state: "hidden",
     stateTime: 0,
@@ -218,45 +215,36 @@ function createSpriteAnimation(options) {
 
     const cycleTime = currentTime - animation.cycleStartTime
 
-    // Frame advancement logic
     this.framesDrawn++
     if (this.framesDrawn >= 15) {
       this.currentFrame = (this.currentFrame + 1) % this.cols
       this.framesDrawn = 0
     }
 
-    // Death state: play death animation once
     if (animation.state === "death") {
       if (animation.currentFrame === animation.cols - 1) {
         this.reset()
         this.changeState("hidden")
         createNewMonster()
       }
-    }
-    // Attack state: play attack animation once
-    else if (animation.state === "attack") {
+    } else if (animation.state === "attack") {
       if (animation.currentFrame === animation.cols - 1) {
-        this.changeState("idle") // Return to idle after attack
+        this.changeState("idle")
+        player.changeState("hit")
         this.refresh()
       }
-    }
-    // Hit state: play hit animation once and switch back to idle
-    else if (animation.state === "hit") {
+    } else if (animation.state === "hit") {
       if (animation.currentFrame === animation.cols - 1) {
         this.changeState("idle")
       }
-    }
-    // Walking state logic
-    else if (cycleTime < 500) {
+    } else if (cycleTime < 500) {
       this.position.x = 1.2
       this.changeState("hidden")
     } else if (cycleTime < 1000) {
       this.changeState("walk")
       const walkProgress = (cycleTime - 500) / animation.walkDuration
       animation.position.x = 1.2 - 0.3 * walkProgress
-    }
-    // Idle state logic
-    else if (cycleTime < 2000) {
+    } else if (cycleTime < 2000) {
       let previousState = this.state
       this.changeState("idle")
       animation.position.x = 0.9
@@ -317,6 +305,194 @@ function createSpriteAnimation(options) {
       case "idle":
         this.currentImage = this.idle.image
         this.cols = this.idle.cols
+        if (attackInProgress) {
+          hp -= currentMonster.attack.dmg
+
+          hpBar.updateHP(hp)
+          console.log(`Attacked! HP remaining: ${hp}`)
+          attackInProgress = false
+
+          if (hp <= 0) {
+            hp = 100
+            console.log("Game Over!")
+            clearInterval(attackInterval)
+          }
+        }
+        break
+      case "hit":
+        this.currentImage = this.hit.image
+        this.cols = this.hit.cols
+        if (attackInProgress) {
+          attackInProgress = false
+        }
+        this.refresh()
+        break
+      case "death":
+        this.currentImage = this.death.image
+        this.cols = this.death.cols
+        if (attackInProgress) {
+          attackInProgress = false
+        }
+        clearInterval(attackInterval)
+        this.reset()
+        break
+      case "attack":
+        this.currentImage = this.attack.image
+        this.cols = this.attack.cols
+        this.refresh()
+        break
+      case "hidden":
+        this.currentImage = this.walk.image
+        this.cols = this.walk.cols
+        break
+    }
+
+    this.spriteWidth = this.currentImage.width / this.cols
+    this.spriteHeight = this.currentImage.height
+
+    this.onStateChange(this.state)
+  }
+
+  return animation
+}
+
+const currentPlayer = {
+  type: "Knight",
+  walk: {
+    image: new Image(),
+    cols: 8,
+  },
+  walkColSize: 8,
+  idleColSize: 7,
+  hitColSize: 4,
+  deathColSize: 12,
+  attackColSize: 7,
+}
+
+function createPlayerAnimation(options) {
+  const animation = {
+    walk: {
+      image: new Image(),
+      cols: options.character.walkColSize,
+    },
+    idle: {
+      image: new Image(),
+      cols: options.character.idleColSize,
+    },
+    hit: {
+      image: new Image(),
+      cols: options.character.hitColSize,
+    },
+    death: {
+      image: new Image(),
+      cols: options.character.deathColSize,
+    },
+    attack: {
+      image: new Image(),
+      cols: options.character.attackColSize,
+    },
+    currentImage: null,
+    cols: options.character.walkColSize || 4,
+    scale: options.scale || 4,
+    canvas: options.canvas,
+    ctx: options.canvas.getContext("2d"),
+    type: "Knight",
+    currentFrame: 0,
+    framesDrawn: 0,
+    position: {
+      x: 0.3,
+      y: 1,
+      offsetY: 125,
+    },
+    state: "walk",
+    stateTime: 0,
+    onStateChange: options.onStateChange || (() => {}),
+  }
+
+  animation.walk.image.src = `sprites/${animation.type}/Run.png`
+  animation.idle.image.src = `sprites/${animation.type}/Idle.png`
+  animation.hit.image.src = `sprites/${animation.type}/Take_Hit.png`
+  animation.death.image.src = `sprites/${animation.type}/Death.png`
+  animation.attack.image.src = `sprites/${animation.type}/Attack.png`
+
+  animation.currentImage = animation.walk.image
+  animation.walk.image.onload = function () {
+    animation.spriteWidth = animation.currentImage.width / animation.cols
+    animation.spriteHeight = animation.currentImage.height
+  }
+
+  animation.update = function () {
+    this.framesDrawn++
+    if (this.framesDrawn >= 15) {
+      this.currentFrame = (this.currentFrame + 1) % this.cols
+      this.framesDrawn = 0
+    }
+
+    if (animation.state === "death") {
+      if (animation.currentFrame === animation.cols - 1) {
+        this.reset()
+        this.changeState("hidden")
+      }
+    } else if (animation.state === "attack") {
+      if (animation.currentFrame === animation.cols - 1) {
+        this.changeState("idle")
+        this.refresh()
+      }
+    } else if (animation.state === "hit") {
+      if (animation.currentFrame === animation.cols - 1) {
+        this.changeState("idle")
+      }
+    }
+  }
+
+  animation.draw = function () {
+    if (animation.state === "hidden") return
+
+    const srcX = this.currentFrame * this.spriteWidth
+    const srcY = 0
+    const destWidth = this.spriteWidth * this.scale
+    const destHeight = this.spriteHeight * this.scale
+
+    const destX = this.canvas.width * this.position.x - destWidth
+    const destY =
+      this.canvas.height * this.position.y - destHeight - this.position.offsetY
+
+    this.ctx.drawImage(
+      this.currentImage,
+      srcX,
+      srcY,
+      this.spriteWidth,
+      this.spriteHeight,
+      destX,
+      destY,
+      destWidth,
+      destHeight
+    )
+  }
+
+  animation.reset = function () {
+    this.framesDrawn = 0
+    this.currentFrame = 0
+    this.cycleStartTime = 0
+  }
+
+  animation.refresh = function () {
+    this.framesDrawn = 0
+    this.currentFrame = 0
+  }
+
+  animation.changeState = function (state) {
+    if (this.state === state) return
+
+    this.state = state
+    switch (state) {
+      case "walk":
+        this.currentImage = this.walk.image
+        this.cols = this.walk.cols
+        break
+      case "idle":
+        this.currentImage = this.idle.image
+        this.cols = this.idle.cols
         break
       case "hit":
         this.currentImage = this.hit.image
@@ -326,7 +502,6 @@ function createSpriteAnimation(options) {
       case "death":
         this.currentImage = this.death.image
         this.cols = this.death.cols
-        clearInterval(attackInterval)
         this.reset()
         break
       case "attack":
@@ -353,56 +528,111 @@ function createWordDisplay() {
   const wordDisplay = document.createElement("div")
   wordDisplay.id = "wordDisplay"
   wordDisplay.style.position = "absolute"
-  wordDisplay.style.top = "20px"
-  wordDisplay.style.left = "50%"
   wordDisplay.style.transform = "translateX(-50%)"
-  wordDisplay.style.fontFamily = "MedievalSharp"
+  wordDisplay.style.fontFamily = "Alagard"
   wordDisplay.style.fontSize = "34px"
-  wordDisplay.style.color = "white"
-  wordDisplay.style.backgroundColor = "#27221b"
-  wordDisplay.style.padding = "6px" // Adds space for the pixel effect
-  wordDisplay.style.borderRadius = "2px"
+  wordDisplay.style.color = "#ECD9B9"
+  wordDisplay.style.backgroundColor = "#1c1714"
+  wordDisplay.style.padding = "8px 16px"
   wordDisplay.style.boxShadow = `
     0px 0px 0px 2px #3d3327,   /* Outer layer for the pixelated effect */
     -2px -2px 0px 2px #3d3327,
     2px -2px 0px 2px #3d3327,
     -2px 2px 0px 2px #3d3327,
     2px 2px 0px 2px #3d3327,
-    -4px -4px 0px 2px #1c1714, /* Inner layer with darker shade */
-    4px -4px 0px 2px #1c1714,
-    -4px 4px 0px 2px #1c1714,
-    4px 4px 0px 2px #1c1714
+    -4px -4px 0px 2px #27221b, /* Inner layer with slightly lighter dark brown */
+    4px -4px 0px 2px #27221b,
+    -4px 4px 0px 2px #27221b,
+    4px 4px 0px 2px #27221b
+  `
+  wordDisplay.style.textShadow = `
+    2px 2px 0 #000,
+    -2px 2px 0 #000,
+    2px -2px 0 #000,
+    -2px -2px 0 #000
   `
 
+  // scanlines effect for more pixelated look
+  const scanlines = document.createElement("div")
+  scanlines.style.position = "absolute"
+  scanlines.style.top = "0"
+  scanlines.style.left = "0"
+  scanlines.style.width = "100%"
+  scanlines.style.height = "100%"
+  scanlines.style.backgroundImage = `
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      transparent 50%,
+      transparent 100%
+    )
+  `
+  scanlines.style.backgroundSize = "100% 4px"
+  scanlines.style.pointerEvents = "none"
+
+  //container for the letters to layer them above the scanlines
+  const letterContainer = document.createElement("div")
+  letterContainer.style.position = "relative"
+  letterContainer.style.zIndex = "1"
+
+  // letter spans with appropriate styling
   currentWord.split("").forEach((char) => {
     const charSpan = document.createElement("span")
     charSpan.innerText = char
-    charSpan.style.backgroundColor = "transparent"
-    charSpan.style.transition = "background-color 0.1s"
-    wordDisplay.appendChild(charSpan)
+    charSpan.style.position = "relative"
+    charSpan.style.transition = "all 0.2s ease"
+    charSpan.style.margin = "0 2px"
+    letterContainer.appendChild(charSpan)
   })
+
+  wordDisplay.appendChild(scanlines)
+  wordDisplay.appendChild(letterContainer)
 
   const wordContainer = document.getElementById("wordContainer")
   wordContainer.appendChild(wordDisplay)
 
-  const monsterX = 0.25 * spriteAnimation.canvas.width
-  const monsterY = 1.05 * spriteAnimation.canvas.height
+  // position the word display above the monster
+  const monsterX = 0.18 * spriteAnimation.canvas.width
+  const monsterY = 1.18 * spriteAnimation.canvas.height
 
-  wordDisplay.style.left = `${monsterX - wordDisplay.offsetWidth / 2}px`
+  wordDisplay.style.left = `${monsterX}px`
   wordDisplay.style.top = `${
-    monsterY - spriteAnimation.spriteHeight * spriteAnimation.scale - 20
-  }px` // 20px above the monster
+    monsterY - spriteAnimation.spriteHeight * spriteAnimation.scale - 40
+  }px`
 }
 
 function updateWordDisplay() {
   const spans = document.querySelectorAll("#wordDisplay span")
   spans.forEach((span, index) => {
     if (index < currentInputIndex) {
-      span.style.backgroundColor = "green"
+      // completed letters
+      span.style.color = "#4a9668"
+      span.style.textShadow = `
+        2px 2px 0 #1d3b2a,
+        -2px 2px 0 #1d3b2a,
+        2px -2px 0 #1d3b2a,
+        -2px -2px 0 #1d3b2a
+      `
+      span.style.transform = "translateY(-2px)"
     } else {
-      span.style.backgroundColor = "transparent"
+      // pending letters
+      span.style.color = "#ECD9B9"
+      span.style.textShadow = `
+        2px 2px 0 #000,
+        -2px 2px 0 #000,
+        2px -2px 0 #000,
+        -2px -2px 0 #000
+      `
+      span.style.transform = "none"
     }
   })
+}
+
+function showNewWord() {
+  const wordContainer = document.getElementById("wordContainer")
+  wordContainer.innerHTML = ""
+  createWordDisplay()
 }
 
 function handleKeyPress(event) {
@@ -412,14 +642,14 @@ function handleKeyPress(event) {
     updateWordDisplay()
 
     if (currentInputIndex === currentWord.length) {
-      currentInputIndex = 0 // Reset for next word
+      currentInputIndex = 0
       wordsTyped++
+      player.changeState("attack")
 
       if (wordsTyped === words.length) {
         spriteAnimation.changeState("death")
         wordsTyped = 0
         currentInputIndex = 0
-        loadRandomWords(2)
         currentWord = words[wordsTyped]
         resetWordContainer()
         return
@@ -435,13 +665,6 @@ function handleKeyPress(event) {
 function resetWordContainer() {
   const wordContainer = document.getElementById("wordContainer")
   wordContainer.innerHTML = ""
-}
-
-function showNewWord() {
-  const wordContainer = document.getElementById("wordContainer")
-  wordContainer.innerHTML = ""
-
-  createWordDisplay()
 }
 
 function ParallaxScene() {
@@ -476,16 +699,24 @@ function ParallaxScene() {
     ),
   ]
 
+  player = createPlayerAnimation({
+    canvas: canvas,
+    scale: 6,
+    character: currentPlayer,
+  })
+
   spriteAnimation = createSpriteAnimation({
     canvas: canvas,
-    scale: 4,
+    scale: 5,
     monster: currentMonster,
     onStateChange: (newState) => {
       if (newState === "idle") {
+        player.changeState("idle")
         layers.forEach((layer) => {
           layer.isMoving = false
         })
       } else if (newState === "hidden") {
+        player.changeState("walk")
         layers.forEach((layer) => {
           layer.isMoving = true
         })
@@ -513,6 +744,8 @@ function ParallaxScene() {
       layer.update()
       layer.draw(ctx)
     })
+    player.update(currentTime)
+    player.draw()
 
     spriteAnimation.update(currentTime)
     spriteAnimation.draw()
@@ -524,8 +757,140 @@ function ParallaxScene() {
   resize()
   requestAnimationFrame(animate)
 }
+
+function createHPBar() {
+  const hpContainer = document.createElement("div")
+  hpContainer.id = "hpContainer"
+  hpContainer.style.position = "absolute"
+  hpContainer.style.top = "20px"
+  hpContainer.style.left = "20px"
+  hpContainer.style.fontFamily = "Alagard"
+
+  const borderContainer = document.createElement("div")
+  borderContainer.style.width = "300px"
+  borderContainer.style.height = "36px"
+  borderContainer.style.position = "relative"
+  borderContainer.style.backgroundColor = "#27221b"
+  borderContainer.style.padding = "3px"
+  borderContainer.style.boxShadow = `
+    0px 0px 0px 2px #3d3327,   /* Outer layer for the pixelated effect */
+    -2px -2px 0px 2px #3d3327,
+    2px -2px 0px 2px #3d3327,
+    -2px 2px 0px 2px #3d3327,
+    2px 2px 0px 2px #3d3327,
+    -4px -4px 0px 2px #1c1714, /* Inner layer with darker shade */
+    4px -4px 0px 2px #1c1714,
+    -4px 4px 0px 2px #1c1714,
+    4px 4px 0px 2px #1c1714
+  `
+
+  const hpBar = document.createElement("div")
+  hpBar.id = "hpBar"
+  hpBar.style.width = "100%"
+  hpBar.style.height = "100%"
+  hpBar.style.backgroundColor = "#a82f2c"
+  hpBar.style.transition = "width 0.3s ease-in-out"
+  hpBar.style.position = "relative"
+  hpBar.style.backgroundImage = `
+    linear-gradient(
+      to bottom,
+      #ed4c4a 0%,
+      #a82f2c 50%,
+      #8b1916 100%
+    )
+  `
+
+  const scanlines = document.createElement("div")
+  scanlines.style.position = "absolute"
+  scanlines.style.top = "0"
+  scanlines.style.left = "0"
+  scanlines.style.width = "100%"
+  scanlines.style.height = "100%"
+  scanlines.style.backgroundImage = `
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 50%,
+      transparent 100%
+    )
+  `
+  scanlines.style.backgroundSize = "100% 4px"
+  scanlines.style.pointerEvents = "none"
+
+  const hpValue = document.createElement("div")
+  hpValue.id = "hpValue"
+  hpValue.style.position = "absolute"
+  hpValue.style.width = "100%"
+  hpValue.style.textAlign = "center"
+  hpValue.style.color = "#ECD9B9"
+  hpValue.style.fontSize = "32px"
+  hpValue.style.fontFamily = "Alagard"
+  hpValue.style.lineHeight = "46px"
+  hpValue.style.textShadow = "2px 2px 0 #000"
+  hpValue.style.zIndex = "1"
+
+  hpBar.appendChild(scanlines)
+  borderContainer.appendChild(hpBar)
+  hpContainer.appendChild(hpValue)
+  hpContainer.appendChild(borderContainer)
+  document.body.appendChild(hpContainer)
+
+  return {
+    updateHP: function (currentHP, maxHP = 100) {
+      const percentage = (currentHP / maxHP) * 100
+      hpBar.style.width = `${percentage}%`
+      hpValue.textContent = `${currentHP}/${maxHP}`
+
+      // change color based on HP level
+      if (percentage <= 20) {
+        hpBar.style.backgroundImage = `
+          linear-gradient(
+            to bottom,
+            #ff3838 0%,
+            #d41f1f 50%,
+            #8b1916 100%
+          )
+        `
+      } else if (percentage <= 50) {
+        hpBar.style.backgroundImage = `
+          linear-gradient(
+            to bottom,
+            #ffa439 0%,
+            #d45e1f 50%,
+            #8b3916 100%
+          )
+        `
+      } else {
+        hpBar.style.backgroundImage = `
+          linear-gradient(
+            to bottom,
+            #ed4c4a 0%,
+            #a82f2c 50%,
+            #8b1916 100%
+          )
+        `
+      }
+    },
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   ParallaxScene()
   initiateAttackSequence()
   window.addEventListener("keypress", handleKeyPress)
+
+  let currentHP = hp
+  Object.defineProperty(window, "hp", {
+    get: function () {
+      return currentHP
+    },
+    set: function (value) {
+      currentHP = Math.max(0, Math.min(value, 100))
+      hpBar.updateHP(currentHP)
+      return currentHP
+    },
+  })
+
+  hpBar.updateHP(hp)
 })
