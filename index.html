@@ -4,21 +4,371 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TypeQuest</title>
-    <link href="styles.css" rel="stylesheet" />
     <link
       href="https://db.onlinewebfonts.com/c/6faad1789bcbd321a458c14d0735d976?family=Alagard"
       rel="stylesheet"
     />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: #1a1a1a;
+        font-family: "Alagard", monospace;
+        color: #ecd9b9;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        background-image: linear-gradient(
+            0deg,
+            rgba(26, 26, 26, 0.9),
+            rgba(26, 26, 26, 0.9)
+          ),
+          url("backgrounds/battleground.png");
+        background-size: cover;
+        backdrop-filter: blur(10px);
+        background-position: center;
+        padding: 2rem;
+      }
+
+      .header {
+        width: 100%;
+        max-width: 800px;
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 1rem;
+      }
+
+      .username-display {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .username-text {
+        font-size: 1.2rem;
+      }
+
+      .change-username-btn {
+        font-family: "Alagard";
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+        background-color: #27221b;
+        color: #ecd9b9;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0px 0px 0px 2px #3d3327, -2px -2px 0px 2px #1c1714,
+          2px -2px 0px 2px #1c1714, -2px 2px 0px 2px #1c1714,
+          2px 2px 0px 2px #1c1714;
+      }
+
+      .change-username-btn:hover {
+        background-color: #32281f;
+      }
+
+      .container {
+        max-width: 800px;
+        width: 100%;
+        text-align: center;
+        margin-top: 2rem;
+      }
+
+      .title {
+        font-size: 5rem;
+        color: #ecd9b9;
+        text-shadow: 4px 4px 0 #4a1310, -4px 4px 0 #4a1310, 4px -4px 0 #4a1310,
+          -4px -4px 0 #4a1310;
+        margin-bottom: 3rem;
+        letter-spacing: 2px;
+      }
+
+      .play-btn {
+        font-family: "Alagard";
+        font-size: 2rem;
+        padding: 1rem 4rem;
+        background-color: #27221b;
+        color: #ecd9b9;
+        border: none;
+        cursor: pointer;
+        margin-bottom: 3rem;
+        position: relative;
+        transition: transform 0.1s;
+        text-decoration: none;
+        display: inline-block;
+        box-shadow: 0px 0px 0px 2px #3d3327, -2px -2px 0px 2px #3d3327,
+          2px -2px 0px 2px #3d3327, -2px 2px 0px 2px #3d3327,
+          2px 2px 0px 2px #3d3327, -4px -4px 0px 2px #1c1714,
+          4px -4px 0px 2px #1c1714, -4px 4px 0px 2px #1c1714,
+          4px 4px 0px 2px #1c1714;
+      }
+
+      .play-btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .play-btn:active {
+        transform: translateY(2px);
+      }
+
+      .scoreboard {
+        background-color: #27221b;
+        padding: 2rem;
+        border-radius: 4px;
+        position: relative;
+        box-shadow: 0px 0px 0px 2px #3d3327, -2px -2px 0px 2px #3d3327,
+          2px -2px 0px 2px #3d3327, -2px 2px 0px 2px #3d3327,
+          2px 2px 0px 2px #3d3327, -4px -4px 0px 2px #1c1714,
+          4px -4px 0px 2px #1c1714, -4px 4px 0px 2px #1c1714,
+          4px 4px 0px 2px #1c1714;
+      }
+
+      .scoreboard h2 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        color: #ecd9b9;
+        text-shadow: 2px 2px 0 #4a1310;
+      }
+
+      .score-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .score-table th,
+      .score-table td {
+        padding: 0.75rem;
+        text-align: center;
+        border-bottom: 2px solid #3d3327;
+      }
+
+      .score-table th {
+        color: #a82f2c;
+        font-size: 1.2rem;
+      }
+
+      .score-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .score-table tr:hover td {
+        background-color: #32281f;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background-color: #27221b;
+        padding: 2rem;
+        position: relative;
+        text-align: center;
+        box-shadow: 0px 0px 0px 2px #3d3327, -4px -4px 0px 2px #1c1714,
+          4px -4px 0px 2px #1c1714, -4px 4px 0px 2px #1c1714,
+          4px 4px 0px 2px #1c1714;
+      }
+
+      .modal input {
+        font-family: "Alagard";
+        font-size: 1.2rem;
+        padding: 0.5rem;
+        margin: 1rem 0;
+        background-color: #1c1714;
+        border: 2px solid #3d3327;
+        color: #ecd9b9;
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .modal button {
+        font-family: "Alagard";
+        font-size: 1.2rem;
+        padding: 0.5rem 2rem;
+        background-color: #a82f2c;
+        color: #ecd9b9;
+        border: none;
+        cursor: pointer;
+        margin-top: 1rem;
+        box-shadow: 0px 0px 0px 2px #3d3327, -2px -2px 0px 2px #1c1714,
+          2px -2px 0px 2px #1c1714, -2px 2px 0px 2px #1c1714,
+          2px 2px 0px 2px #1c1714;
+      }
+
+      .modal button:hover {
+        background-color: #8b1916;
+      }
+    </style>
   </head>
   <body>
-    <div id="page">
-      <h1>TypeQuest</h1>
-      <li id="menuOptions">
-        <ul id="playOption">
-          PLAY
-        </ul>
-      </li>
+    <div class="header">
+      <div class="username-display">
+        <span class="username-text"
+          >Player: <span id="currentUsername">Guest</span></span
+        >
+        <button class="change-username-btn" onclick="showUsernameModal()">
+          Change Username
+        </button>
+      </div>
     </div>
-    <script src="script.js"></script>
+
+    <div class="container">
+      <h1 class="title">TypeQuest</h1>
+      <a href="#" class="play-btn" onclick="startGame()">PLAY</a>
+
+      <div class="scoreboard">
+        <h2>High Scores</h2>
+        <table class="score-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Username</th>
+              <th>Score</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="scoreTableBody">
+            <!-- Scores will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="usernameModal" class="modal">
+      <div class="modal-content">
+        <h2>Enter Your Username</h2>
+        <input
+          type="text"
+          id="usernameInput"
+          maxlength="15"
+          placeholder="Username"
+        />
+        <button onclick="setUsername()">Set Username</button>
+      </div>
+    </div>
+
+    <script>
+      // Score management
+      class ScoreManager {
+        constructor() {
+          this.scores = this.loadScores()
+        }
+
+        loadScores() {
+          const scores = localStorage.getItem("typequest-scores")
+          return scores ? JSON.parse(scores) : []
+        }
+
+        saveScore(username, score) {
+          const newScore = {
+            username,
+            score,
+            date: new Date().toISOString(),
+          }
+          this.scores.push(newScore)
+          this.scores.sort((a, b) => b.score - a.score)
+          this.scores = this.scores.slice(0, 10) // Keep only top 10
+          localStorage.setItem("typequest-scores", JSON.stringify(this.scores))
+          this.updateScoreboardDisplay()
+        }
+
+        updateScoreboardDisplay() {
+          const tableBody = document.getElementById("scoreTableBody")
+          tableBody.innerHTML = ""
+
+          this.scores.forEach((score, index) => {
+            const row = document.createElement("tr")
+            const date = new Date(score.date)
+            row.innerHTML = `
+              <td>${index + 1}</td>
+              <td>${score.username}</td>
+              <td>${score.score}</td>
+              <td>${date.toLocaleDateString()}</td>
+            `
+            tableBody.appendChild(row)
+          })
+        }
+      }
+
+      // Initialize score manager
+      const scoreManager = new ScoreManager()
+      scoreManager.updateScoreboardDisplay()
+
+      // Username management
+      function checkUsername() {
+        const username = localStorage.getItem("typequest-current-user")
+        if (!username) {
+          showUsernameModal()
+        } else {
+          document.getElementById("currentUsername").textContent = username
+        }
+      }
+
+      function showUsernameModal() {
+        const modal = document.getElementById("usernameModal")
+        modal.style.display = "flex"
+        document.getElementById("usernameInput").value =
+          localStorage.getItem("typequest-current-user") || ""
+      }
+
+      function setUsername() {
+        const username = document.getElementById("usernameInput").value.trim()
+        if (username) {
+          localStorage.setItem("typequest-current-user", username)
+          document.getElementById("currentUsername").textContent = username
+          document.getElementById("usernameModal").style.display = "none"
+        }
+      }
+
+      function startGame() {
+        const username = localStorage.getItem("typequest-current-user")
+        if (username) {
+          window.location.href = "game.html"
+        } else {
+          showUsernameModal()
+        }
+      }
+
+      // Handle Enter key in username input
+      document
+        .getElementById("usernameInput")
+        .addEventListener("keypress", (e) => {
+          if (e.key === "Enter") {
+            setUsername()
+          }
+        })
+
+      // Close modal if clicking outside
+      document
+        .getElementById("usernameModal")
+        .addEventListener("click", (e) => {
+          if (e.target.id === "usernameModal") {
+            e.target.style.display = "none"
+          }
+        })
+
+      // Example of how to save a score (call this from game.html when game ends)
+      function saveScore(score) {
+        const username = localStorage.getItem("typequest-current-user")
+        if (username) {
+          scoreManager.saveScore(username, score)
+        }
+      }
+
+      // Check username when page loads
+      document.addEventListener("DOMContentLoaded", checkUsername)
+    </script>
   </body>
 </html>
