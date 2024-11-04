@@ -1,23 +1,36 @@
-body,
 html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
+    
 }
-canvas {
-  display: block;
+body {
+    background-image: url('backgrounds/Battleground4.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    font-family: Alagard;
+    color: #ECD9B9;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    backdrop-filter: blur(15px);
+    width: 100vw;
+    height: 100vh;
+    margin: 0px;
 }
-#wordContainer {
-  position: absolute;
-  top: 20px;
-  font-size: 24px;
-  color: white;
+
+
+
+#playOption:hover {
+    color: #56c213;
 }
-.correct {
-  background-color: green;
+
+h1 {
+    font-size: 84px;    
+
+    margin: auto;
+    text-align: center;
+    padding-top: 56px;
+    filter: blur(0);
+    filter: none;
 }
+
+ul {
+    font-size: 36px;
+}
+

@@ -4,21 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TypeQuest</title>
-    <link href="styles.css" rel="stylesheet" />
+    <link href="gameStyles.css" rel="stylesheet" />
     <link
       href="https://db.onlinewebfonts.com/c/6faad1789bcbd321a458c14d0735d976?family=Alagard"
       rel="stylesheet"
     />
   </head>
   <body>
-    <div id="page">
-      <h1>TypeQuest</h1>
-      <li id="menuOptions">
-        <ul id="playOption">
-          PLAY
-        </ul>
-      </li>
+    <canvas id="parallaxCanvas"></canvas>
+    <div id="hpContainer">
+      <div id="borderContainer">
+        <div id="hpValue"></div>
+        <div id="hpBar">
+          <div id="scanlines"></div>
+        </div>
+      </div>
     </div>
-    <script src="script.js"></script>
+    <div id="wordContainer"></div>
+    <script src="gameScript.js"></script>
   </body>
 </html>
