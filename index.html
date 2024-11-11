@@ -16,15 +16,13 @@
         <span class="username-text"
           >Player: <span id="currentUsername">Guest</span></span
         >
-        <button class="change-username-btn" onclick="showUsernameModal()">
-          Change Username
-        </button>
+        <button id="change-username-btn">Change Username</button>
       </div>
     </div>
 
     <div class="container">
       <h1 class="title">TypeQuest</h1>
-      <a href="#" class="play-btn" onclick="startGame()">PLAY</a>
+      <div id="play-btn"">PLAY</div>
 
       <div class="scoreboard">
         <h2>High Scores</h2>
@@ -51,10 +49,10 @@
           maxlength="15"
           placeholder="Username"
         />
-        <button onclick="setUsername()">Set Username</button>
+        <button id="set-username-btn">Set Username</button>
       </div>
     </div>
 
-    <script></script>
+    <script src="script.js"></script>
   </body>
 </html>

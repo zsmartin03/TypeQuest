@@ -1,11 +1,370 @@
 let spriteAnimation = {}
 let player = {}
 let hp = 100
-let msPerFrame = 7
+let msPerFrame = localStorage.getItem("refresh-rate") > 100 ? 15 : 7
+let points = 0
 
 let attackInterval
 
 const wordsArray = [
+  "the",
+  "of",
+  "to",
+  "and",
+  "a",
+  "in",
+  "is",
+  "it",
+  "you",
+  "that",
+  "he",
+  "was",
+  "for",
+  "on",
+  "are",
+  "with",
+  "as",
+  "I",
+  "his",
+  "they",
+  "be",
+  "at",
+  "one",
+  "have",
+  "this",
+  "from",
+  "or",
+  "had",
+  "by",
+  "hot",
+  "but",
+  "some",
+  "what",
+  "there",
+  "we",
+  "can",
+  "out",
+  "other",
+  "were",
+  "all",
+  "your",
+  "when",
+  "up",
+  "use",
+  "word",
+  "how",
+  "said",
+  "an",
+  "each",
+  "she",
+  "which",
+  "do",
+  "their",
+  "time",
+  "if",
+  "will",
+  "way",
+  "about",
+  "many",
+  "then",
+  "them",
+  "would",
+  "write",
+  "like",
+  "so",
+  "these",
+  "her",
+  "long",
+  "make",
+  "thing",
+  "see",
+  "him",
+  "two",
+  "has",
+  "look",
+  "more",
+  "day",
+  "could",
+  "go",
+  "come",
+  "did",
+  "my",
+  "sound",
+  "no",
+  "most",
+  "number",
+  "who",
+  "over",
+  "know",
+  "water",
+  "than",
+  "call",
+  "first",
+  "people",
+  "may",
+  "down",
+  "side",
+  "been",
+  "now",
+  "find",
+  "any",
+  "new",
+  "work",
+  "part",
+  "take",
+  "get",
+  "place",
+  "made",
+  "live",
+  "where",
+  "after",
+  "back",
+  "little",
+  "only",
+  "round",
+  "man",
+  "year",
+  "came",
+  "show",
+  "every",
+  "good",
+  "me",
+  "give",
+  "our",
+  "under",
+  "name",
+  "very",
+  "through",
+  "just",
+  "form",
+  "much",
+  "great",
+  "think",
+  "say",
+  "help",
+  "low",
+  "line",
+  "before",
+  "turn",
+  "cause",
+  "same",
+  "mean",
+  "differ",
+  "move",
+  "right",
+  "boy",
+  "old",
+  "too",
+  "does",
+  "tell",
+  "sentence",
+  "set",
+  "three",
+  "want",
+  "air",
+  "well",
+  "also",
+  "play",
+  "small",
+  "end",
+  "put",
+  "home",
+  "read",
+  "hand",
+  "port",
+  "large",
+  "spell",
+  "add",
+  "even",
+  "land",
+  "here",
+  "must",
+  "big",
+  "high",
+  "such",
+  "follow",
+  "act",
+  "why",
+  "ask",
+  "men",
+  "change",
+  "went",
+  "light",
+  "kind",
+  "off",
+  "need",
+  "house",
+  "picture",
+  "try",
+  "us",
+  "again",
+  "animal",
+  "point",
+  "mother",
+  "world",
+  "near",
+  "build",
+  "self",
+  "earth",
+  "father",
+  "head",
+  "stand",
+  "own",
+  "page",
+  "should",
+  "country",
+  "found",
+  "answer",
+  "school",
+  "grow",
+  "study",
+  "still",
+  "learn",
+  "plant",
+  "cover",
+  "food",
+  "sun",
+  "four",
+  "thought",
+  "let",
+  "keep",
+  "eye",
+  "never",
+  "last",
+  "door",
+  "between",
+  "city",
+  "tree",
+  "cross",
+  "since",
+  "hard",
+  "start",
+  "might",
+  "story",
+  "saw",
+  "far",
+  "sea",
+  "draw",
+  "left",
+  "late",
+  "run",
+  "don't",
+  "while",
+  "press",
+  "close",
+  "night",
+  "real",
+  "life",
+  "few",
+  "stop",
+  "open",
+  "seem",
+  "together",
+  "next",
+  "white",
+  "children",
+  "begin",
+  "got",
+  "walk",
+  "example",
+  "ease",
+  "paper",
+  "often",
+  "always",
+  "music",
+  "those",
+  "both",
+  "mark",
+  "book",
+  "letter",
+  "until",
+  "mile",
+  "river",
+  "car",
+  "feet",
+  "care",
+  "second",
+  "group",
+  "carry",
+  "took",
+  "rain",
+  "eat",
+  "room",
+  "friend",
+  "began",
+  "idea",
+  "fish",
+  "mountain",
+  "north",
+  "once",
+  "base",
+  "hear",
+  "horse",
+  "cut",
+  "sure",
+  "watch",
+  "color",
+  "face",
+  "wood",
+  "main",
+  "enough",
+  "plain",
+  "girl",
+  "usual",
+  "young",
+  "ready",
+  "above",
+  "ever",
+  "red",
+  "list",
+  "though",
+  "feel",
+  "talk",
+  "bird",
+  "soon",
+  "body",
+  "dog",
+  "family",
+  "direct",
+  "pose",
+  "leave",
+  "song",
+  "measure",
+  "state",
+  "product",
+  "black",
+  "short",
+  "numeral",
+  "class",
+  "wind",
+  "question",
+  "happen",
+  "complete",
+  "ship",
+  "area",
+  "half",
+  "rock",
+  "order",
+  "fire",
+  "south",
+  "problem",
+  "piece",
+  "told",
+  "knew",
+  "pass",
+  "farm",
+  "top",
+  "whole",
+  "king",
+  "size",
+  "heard",
+  "best",
+  "hour",
+  "better",
+  "TRUE",
+  "during",
+  "hundred",
+  "am",
   "remember",
   "step",
   "early",
@@ -27,6 +386,127 @@ const wordsArray = [
   "simple",
   "several",
   "vowel",
+  "toward",
+  "war",
+  "lay",
+  "against",
+  "pattern",
+  "slow",
+  "center",
+  "love",
+  "person",
+  "money",
+  "serve",
+  "appear",
+  "road",
+  "map",
+  "science",
+  "rule",
+  "govern",
+  "pull",
+  "cold",
+  "notice",
+  "voice",
+  "fall",
+  "power",
+  "town",
+  "fine",
+  "certain",
+  "fly",
+  "unit",
+  "lead",
+  "cry",
+  "dark",
+  "machine",
+  "note",
+  "wait",
+  "plan",
+  "figure",
+  "star",
+  "box",
+  "noun",
+  "field",
+  "rest",
+  "correct",
+  "able",
+  "pound",
+  "done",
+  "beauty",
+  "drive",
+  "stood",
+  "contain",
+  "front",
+  "teach",
+  "week",
+  "final",
+  "gave",
+  "green",
+  "oh",
+  "quick",
+  "develop",
+  "sleep",
+  "warm",
+  "free",
+  "minute",
+  "strong",
+  "special",
+  "mind",
+  "behind",
+  "clear",
+  "tail",
+  "produce",
+  "fact",
+  "street",
+  "inch",
+  "lot",
+  "nothing",
+  "course",
+  "stay",
+  "wheel",
+  "full",
+  "force",
+  "blue",
+  "object",
+  "decide",
+  "surface",
+  "deep",
+  "moon",
+  "island",
+  "foot",
+  "yet",
+  "busy",
+  "test",
+  "record",
+  "boat",
+  "common",
+  "gold",
+  "possible",
+  "plane",
+  "age",
+  "dry",
+  "wonder",
+  "laugh",
+  "thousand",
+  "ago",
+  "ran",
+  "check",
+  "game",
+  "shape",
+  "yes",
+  "hot",
+  "miss",
+  "brought",
+  "heat",
+  "snow",
+  "bed",
+  "bring",
+  "sit",
+  "perhaps",
+  "fill",
+  "east",
+  "weight",
+  "language",
+  "among",
 ]
 
 const backgroundLayers = [
@@ -47,6 +527,7 @@ const monsters = [
     attackColSize: 9,
     attack: { dmg: 5, time: 5000 },
     requiredWords: 5,
+    pointsWorth: 500,
   },
   {
     type: "Goblin",
@@ -57,6 +538,7 @@ const monsters = [
     attackColSize: 9,
     attack: { dmg: 2, time: 2000 },
     requiredWords: 3,
+    pointsWorth: 300,
   },
   {
     type: "Mushroom",
@@ -67,8 +549,307 @@ const monsters = [
     attackColSize: 9,
     attack: { dmg: 2, time: 2000 },
     requiredWords: 2,
+    pointsWorth: 200,
   },
 ]
+
+function getCurrentUsername() {
+  return localStorage.getItem("typequest-current-user") || "Guest"
+}
+
+function saveScore(score) {
+  const username = getCurrentUsername()
+  const currentDate = new Date().toISOString()
+
+  // Get existing scores or initialize empty array
+  let scores = JSON.parse(localStorage.getItem("typequest-scores") || "[]")
+
+  // Add new score
+  scores.push({
+    username,
+    score,
+    date: currentDate,
+  })
+
+  // Sort scores by highest first
+  scores.sort((a, b) => b.score - a.score)
+
+  // Optionally limit to top N scores (e.g., top 10)
+  scores = scores.slice(0, 10)
+
+  // Save back to localStorage
+  localStorage.setItem("typequest-scores", JSON.stringify(scores))
+}
+
+let pointsDisplay = null
+
+// Add this function to create and update the points display
+function createPointsDisplay() {
+  const pointsContainer = document.createElement("div")
+  pointsContainer.id = "pointsContainer"
+  pointsContainer.style.position = "absolute"
+  pointsContainer.style.top = "20px"
+  pointsContainer.style.right = "20px"
+  pointsContainer.style.fontFamily = "Alagard"
+  pointsContainer.style.zIndex = "1000"
+
+  const borderContainer = document.createElement("div")
+  borderContainer.style.backgroundColor = "#1c1714"
+  borderContainer.style.padding = "8px 16px"
+  borderContainer.style.boxShadow = `
+    0px 0px 0px 2px #3d3327,
+    -2px -2px 0px 2px #3d3327,
+    2px -2px 0px 2px #3d3327,
+    -2px 2px 0px 2px #3d3327,
+    2px 2px 0px 2px #3d3327,
+    -4px -4px 0px 2px #27221b,
+    4px -4px 0px 2px #27221b,
+    -4px 4px 0px 2px #27221b,
+    4px 4px 0px 2px #27221b
+  `
+
+  const pointsValue = document.createElement("div")
+  pointsValue.id = "pointsValue"
+  pointsValue.style.color = "#ECD9B9"
+  pointsValue.style.fontSize = "32px"
+  pointsValue.style.textShadow = `
+    2px 2px 0 #000,
+    -2px 2px 0 #000,
+    2px -2px 0 #000,
+    -2px -2px 0 #000
+  `
+  pointsValue.textContent = `Points: ${points}`
+
+  const scanlines = document.createElement("div")
+  scanlines.style.position = "absolute"
+  scanlines.style.top = "0"
+  scanlines.style.left = "0"
+  scanlines.style.width = "100%"
+  scanlines.style.height = "100%"
+  scanlines.style.backgroundImage = `
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 50%,
+      transparent 100%
+    )
+  `
+  scanlines.style.backgroundSize = "100% 4px"
+  scanlines.style.pointerEvents = "none"
+
+  borderContainer.appendChild(pointsValue)
+  borderContainer.appendChild(scanlines)
+  pointsContainer.appendChild(borderContainer)
+  document.body.appendChild(pointsContainer)
+
+  return pointsValue
+}
+
+// Add this function to update the points display
+function updatePoints(value) {
+  points = value
+  if (pointsDisplay) {
+    pointsDisplay.textContent = `Points: ${points}`
+  }
+}
+
+// Add this function to show points gained animation
+function showPointsGained(amount) {
+  const pointsGained = document.createElement("div")
+  pointsGained.style.position = "absolute"
+  pointsGained.style.right = "20px"
+  pointsGained.style.top = "70px" // Below the points display
+  pointsGained.style.color = "#4a9668"
+  pointsGained.style.fontFamily = "Alagard"
+  pointsGained.style.fontSize = "24px"
+  pointsGained.style.textShadow = `
+    2px 2px 0 #1d3b2a,
+    -2px 2px 0 #1d3b2a,
+    2px -2px 0 #1d3b2a,
+    -2px -2px 0 #1d3b2a
+  `
+  pointsGained.textContent = `+${amount}`
+  document.body.appendChild(pointsGained)
+
+  // Animate the points gained
+  let opacity = 1
+  let top = 70
+  const animate = () => {
+    opacity -= 0.02
+    top -= 1
+    pointsGained.style.opacity = opacity
+    pointsGained.style.top = `${top}px`
+
+    if (opacity > 0) {
+      requestAnimationFrame(animate)
+    } else {
+      pointsGained.remove()
+    }
+  }
+
+  requestAnimationFrame(animate)
+}
+
+function showGameOver(finalScore) {
+  const gameOverContainer = document.createElement("div")
+  gameOverContainer.style.position = "fixed"
+  gameOverContainer.style.top = "50%"
+  gameOverContainer.style.left = "50%"
+  gameOverContainer.style.transform = "translate(-50%, -50%)"
+  gameOverContainer.style.backgroundColor = "#14110F" // Darker shade for the background
+  gameOverContainer.style.padding = "20px 40px"
+  gameOverContainer.style.textAlign = "center"
+  gameOverContainer.style.fontFamily = "Alagard"
+  gameOverContainer.style.zIndex = "2000"
+  gameOverContainer.style.boxShadow = `
+    0px 0px 0px 2px #3d3327,
+    -2px -2px 0px 2px #3d3327,
+    2px -2px 0px 2px #3d3327,
+    -2px 2px 0px 2px #3d3327,
+    2px 2px 0px 2px #3d3327,
+    -4px -4px 0px 2px #27221b,
+    4px -4px 0px 2px #27221b,
+    -4px 4px 0px 2px #27221b,
+    4px 4px 0px 2px #27221b
+  `
+
+  const gameOverTitle = document.createElement("h1")
+  gameOverTitle.textContent = "Game Over"
+  gameOverTitle.style.color = "#ed4c4a"
+  gameOverTitle.style.fontSize = "48px"
+  gameOverTitle.style.marginBottom = "20px"
+  gameOverTitle.style.textShadow = `
+    2px 2px 0 #000,
+    -2px 2px 0 #000,
+    2px -2px 0 #000,
+    -2px -2px 0 #000
+  `
+
+  const scoreText = document.createElement("p")
+  scoreText.textContent = `Final Score: ${finalScore}`
+  scoreText.style.color = "#ECD9B9"
+  scoreText.style.fontSize = "32px"
+  scoreText.style.marginBottom = "20px"
+  scoreText.style.textShadow = `
+    2px 2px 0 #000,
+    -2px 2px 0 #000,
+    2px -2px 0 #000,
+    -2px -2px 0 #000
+  `
+
+  const username = getCurrentUsername()
+  const usernameText = document.createElement("p")
+  usernameText.textContent = `Played as: ${username}`
+  usernameText.style.color = "#ECD9B9"
+  usernameText.style.fontSize = "24px"
+  usernameText.style.marginBottom = "30px"
+  usernameText.style.textShadow = `
+    2px 2px 0 #000,
+    -2px 2px 0 #000,
+    2px -2px 0 #000,
+    -2px -2px 0 #000
+  `
+
+  const playAgainButton = document.createElement("button")
+  playAgainButton.textContent = "Play Again"
+  playAgainButton.style.fontFamily = "Alagard"
+  playAgainButton.style.fontSize = "24px"
+  playAgainButton.style.padding = "10px 20px"
+  playAgainButton.style.marginRight = "15px"
+  playAgainButton.style.backgroundColor = "#4a9668"
+  playAgainButton.style.color = "#ECD9B9"
+  playAgainButton.style.border = "none"
+  playAgainButton.style.cursor = "pointer"
+  playAgainButton.style.textShadow = `
+    2px 2px 0 #1d3b2a,
+    -2px 2px 0 #1d3b2a,
+    2px -2px 0 #1d3b2a,
+    -2px -2px 0 #1d3b2a
+  `
+  playAgainButton.style.boxShadow = `
+    0px 0px 0px 2px #3d3327,
+    -2px -2px 0px 2px #3d3327,
+    2px -2px 0px 2px #3d3327,
+    -2px 2px 0px 2px #3d3327,
+    2px 2px 0px 2px #3d3327
+  `
+
+  playAgainButton.addEventListener("mouseover", () => {
+    playAgainButton.style.backgroundColor = "#5db37e"
+  })
+
+  playAgainButton.addEventListener("mouseout", () => {
+    playAgainButton.style.backgroundColor = "#4a9668"
+  })
+
+  playAgainButton.addEventListener("click", () => {
+    location.reload()
+  })
+
+  // Back Button
+  const backButton = document.createElement("button")
+  backButton.textContent = "Back to Menu"
+  backButton.style.fontFamily = "Alagard"
+  backButton.style.fontSize = "24px"
+  backButton.style.padding = "10px 20px"
+  backButton.style.marginLeft = "15px"
+  backButton.style.backgroundColor = "#8b3c3a"
+  backButton.style.color = "#ECD9B9"
+  backButton.style.border = "none"
+  backButton.style.cursor = "pointer"
+  backButton.style.textShadow = `
+    2px 2px 0 #4b1918,
+    -2px 2px 0 #4b1918,
+    2px -2px 0 #4b1918,
+    -2px -2px 0 #4b1918
+  `
+  backButton.style.boxShadow = `
+    0px 0px 0px 2px #3d3327,
+    -2px -2px 0px 2px #3d3327,
+    2px -2px 0px 2px #3d3327,
+    -2px 2px 0px 2px #3d3327,
+    2px 2px 0px 2px #3d3327
+  `
+
+  backButton.addEventListener("mouseover", () => {
+    backButton.style.backgroundColor = "#a64c4a"
+  })
+
+  backButton.addEventListener("mouseout", () => {
+    backButton.style.backgroundColor = "#8b3c3a"
+  })
+
+  backButton.addEventListener("click", () => {
+    window.location.href = "index.html"
+  })
+
+  const scanlines = document.createElement("div")
+  scanlines.style.position = "absolute"
+  scanlines.style.top = "0"
+  scanlines.style.left = "0"
+  scanlines.style.width = "100%"
+  scanlines.style.height = "100%"
+  scanlines.style.backgroundImage = `
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 50%,
+      transparent 100%
+    )
+  `
+  scanlines.style.backgroundSize = "100% 4px"
+  scanlines.style.pointerEvents = "none"
+
+  gameOverContainer.appendChild(gameOverTitle)
+  gameOverContainer.appendChild(scoreText)
+  gameOverContainer.appendChild(usernameText)
+  gameOverContainer.appendChild(playAgainButton)
+  gameOverContainer.appendChild(backButton) // Add the Back button
+  gameOverContainer.appendChild(scanlines)
+  document.body.appendChild(gameOverContainer)
+}
 
 let currentMonster = monsters[Math.floor(Math.random() * monsters.length)]
 
@@ -320,9 +1101,12 @@ function createSpriteAnimation(options) {
           attackInProgress = false
 
           if (hp <= 0) {
+            saveScore(points)
             hp = 100
             console.log("Game Over!")
             clearInterval(attackInterval)
+            showGameOver(points)
+            updatePoints(0)
           }
         }
         break
@@ -342,6 +1126,8 @@ function createSpriteAnimation(options) {
         }
         clearInterval(attackInterval)
         this.reset()
+        updatePoints(points + currentMonster.pointsWorth)
+        showPointsGained(currentMonster.pointsWorth)
         break
       case "attack":
         this.currentImage = this.attack.image
@@ -441,8 +1227,8 @@ function createPlayerAnimation(options) {
       }
     } else if (animation.state === "attack") {
       if (animation.currentFrame === animation.cols - 1) {
-        this.changeState("idle")
         this.refresh()
+        this.changeState("idle")
       }
     } else if (animation.state === "hit") {
       if (animation.currentFrame === animation.cols - 1) {
@@ -776,4 +1562,5 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 
   updateHP(hp)
+  pointsDisplay = createPointsDisplay()
 })
