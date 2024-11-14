@@ -29,6 +29,26 @@ class ScoreManager {
 const scoreManager = new ScoreManager()
 scoreManager.updateScoreboardDisplay()
 
+function detectRefreshRate(callback) {
+  let start, end
+  let frameCount = 0
+
+  function frame() {
+    if (frameCount === 0) {
+      start = performance.now()
+    } else if (frameCount === 60) {
+      end = performance.now()
+      const fps = 1000 / ((end - start) / 60)
+      callback(fps)
+      return
+    }
+    frameCount++
+    requestAnimationFrame(frame)
+  }
+
+  requestAnimationFrame(frame)
+}
+
 function checkUsername() {
   const username = localStorage.getItem("typequest-current-user")
   if (!username) {
@@ -66,6 +86,9 @@ function setUsername() {
 
 document.addEventListener("DOMContentLoaded", () => {
   checkUsername()
+  detectRefreshRate((fps) => {
+    localStorage.setItem("refresh-rate", fps.toFixed(0))
+  })
 })
 
 document.getElementById("play-btn").addEventListener("click", startGame)

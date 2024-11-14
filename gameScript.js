@@ -554,26 +554,6 @@ const monsters = [
   },
 ]
 
-function detectRefreshRate(callback) {
-  let start, end
-  let frameCount = 0
-
-  function frame() {
-    if (frameCount === 0) {
-      start = performance.now()
-    } else if (frameCount === 60) {
-      end = performance.now()
-      const fps = 1000 / ((end - start) / 60)
-      callback(fps)
-      return
-    }
-    frameCount++
-    requestAnimationFrame(frame)
-  }
-
-  requestAnimationFrame(frame)
-}
-
 function getCurrentUsername() {
   return localStorage.getItem("typequest-current-user") || "Guest"
 }
@@ -1567,8 +1547,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   updateHP(currentPlayer.hp)
   pointsDisplay = document.getElementById("pointsValue")
-  detectRefreshRate((fps) => {
-    localStorage.setItem("refresh-rate", fps.toFixed(0))
-  })
+
   msPerFrame = localStorage.getItem("refresh-rate") > 100 ? 15 : 7
 })
