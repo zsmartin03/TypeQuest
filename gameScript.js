@@ -1,10 +1,11 @@
 let spriteAnimation = {}
 let player = {}
-let hp = 100
-let msPerFrame = localStorage.getItem("refresh-rate") > 100 ? 15 : 7
+let msPerFrame = 15
 let points = 0
+let pointsDisplay = null
 
-let attackInterval
+let attackInterval = 0
+let attackInProgress = false
 
 const wordsArray = [
   "the",
@@ -525,7 +526,7 @@ const monsters = [
     hitColSize: 4,
     deathColSize: 4,
     attackColSize: 9,
-    attack: { dmg: 5, time: 5000 },
+    attack: { dmg: 15, time: 2500 },
     requiredWords: 5,
     pointsWorth: 500,
   },
@@ -536,7 +537,7 @@ const monsters = [
     hitColSize: 4,
     deathColSize: 4,
     attackColSize: 9,
-    attack: { dmg: 2, time: 2000 },
+    attack: { dmg: 8, time: 1500 },
     requiredWords: 3,
     pointsWorth: 300,
   },
@@ -547,11 +548,31 @@ const monsters = [
     hitColSize: 4,
     deathColSize: 4,
     attackColSize: 9,
-    attack: { dmg: 2, time: 2000 },
+    attack: { dmg: 2, time: 1500 },
     requiredWords: 2,
     pointsWorth: 200,
   },
 ]
+
+function detectRefreshRate(callback) {
+  let start, end
+  let frameCount = 0
+
+  function frame() {
+    if (frameCount === 0) {
+      start = performance.now()
+    } else if (frameCount === 60) {
+      end = performance.now()
+      const fps = 1000 / ((end - start) / 60)
+      callback(fps)
+      return
+    }
+    frameCount++
+    requestAnimationFrame(frame)
+  }
+
+  requestAnimationFrame(frame)
+}
 
 function getCurrentUsername() {
   return localStorage.getItem("typequest-current-user") || "Guest"
@@ -561,92 +582,19 @@ function saveScore(score) {
   const username = getCurrentUsername()
   const currentDate = new Date().toISOString()
 
-  // Get existing scores or initialize empty array
   let scores = JSON.parse(localStorage.getItem("typequest-scores") || "[]")
 
-  // Add new score
   scores.push({
     username,
     score,
     date: currentDate,
   })
 
-  // Sort scores by highest first
   scores.sort((a, b) => b.score - a.score)
 
-  // Optionally limit to top N scores (e.g., top 10)
-  scores = scores.slice(0, 10)
-
-  // Save back to localStorage
   localStorage.setItem("typequest-scores", JSON.stringify(scores))
 }
 
-let pointsDisplay = null
-
-// Add this function to create and update the points display
-function createPointsDisplay() {
-  const pointsContainer = document.createElement("div")
-  pointsContainer.id = "pointsContainer"
-  pointsContainer.style.position = "absolute"
-  pointsContainer.style.top = "20px"
-  pointsContainer.style.right = "20px"
-  pointsContainer.style.fontFamily = "Alagard"
-  pointsContainer.style.zIndex = "1000"
-
-  const borderContainer = document.createElement("div")
-  borderContainer.style.backgroundColor = "#1c1714"
-  borderContainer.style.padding = "8px 16px"
-  borderContainer.style.boxShadow = `
-    0px 0px 0px 2px #3d3327,
-    -2px -2px 0px 2px #3d3327,
-    2px -2px 0px 2px #3d3327,
-    -2px 2px 0px 2px #3d3327,
-    2px 2px 0px 2px #3d3327,
-    -4px -4px 0px 2px #27221b,
-    4px -4px 0px 2px #27221b,
-    -4px 4px 0px 2px #27221b,
-    4px 4px 0px 2px #27221b
-  `
-
-  const pointsValue = document.createElement("div")
-  pointsValue.id = "pointsValue"
-  pointsValue.style.color = "#ECD9B9"
-  pointsValue.style.fontSize = "32px"
-  pointsValue.style.textShadow = `
-    2px 2px 0 #000,
-    -2px 2px 0 #000,
-    2px -2px 0 #000,
-    -2px -2px 0 #000
-  `
-  pointsValue.textContent = `Points: ${points}`
-
-  const scanlines = document.createElement("div")
-  scanlines.style.position = "absolute"
-  scanlines.style.top = "0"
-  scanlines.style.left = "0"
-  scanlines.style.width = "100%"
-  scanlines.style.height = "100%"
-  scanlines.style.backgroundImage = `
-    linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.1) 50%,
-      transparent 50%,
-      transparent 100%
-    )
-  `
-  scanlines.style.backgroundSize = "100% 4px"
-  scanlines.style.pointerEvents = "none"
-
-  borderContainer.appendChild(pointsValue)
-  borderContainer.appendChild(scanlines)
-  pointsContainer.appendChild(borderContainer)
-  document.body.appendChild(pointsContainer)
-
-  return pointsValue
-}
-
-// Add this function to update the points display
 function updatePoints(value) {
   points = value
   if (pointsDisplay) {
@@ -654,12 +602,12 @@ function updatePoints(value) {
   }
 }
 
-// Add this function to show points gained animation
 function showPointsGained(amount) {
   const pointsGained = document.createElement("div")
   pointsGained.style.position = "absolute"
+  pointsGained.style.zIndex = "1000"
   pointsGained.style.right = "20px"
-  pointsGained.style.top = "70px" // Below the points display
+  pointsGained.style.top = "80px"
   pointsGained.style.color = "#4a9668"
   pointsGained.style.fontFamily = "Alagard"
   pointsGained.style.fontSize = "24px"
@@ -672,12 +620,11 @@ function showPointsGained(amount) {
   pointsGained.textContent = `+${amount}`
   document.body.appendChild(pointsGained)
 
-  // Animate the points gained
   let opacity = 1
-  let top = 70
+  let top = 80
   const animate = () => {
-    opacity -= 0.02
-    top -= 1
+    opacity -= 0.005
+    top -= 0.25
     pointsGained.style.opacity = opacity
     pointsGained.style.top = `${top}px`
 
@@ -784,6 +731,7 @@ function showGameOver(finalScore) {
   })
 
   playAgainButton.addEventListener("click", () => {
+    localStorage.setItem("isAllowed", "true")
     location.reload()
   })
 
@@ -821,7 +769,7 @@ function showGameOver(finalScore) {
   })
 
   backButton.addEventListener("click", () => {
-    window.location.href = "index.html"
+    window.location.href = "index.html	"
   })
 
   const scanlines = document.createElement("div")
@@ -921,29 +869,27 @@ function createNewMonster() {
   currentMonster = monsters[Math.floor(Math.random() * monsters.length)]
   words = getRandomWords(currentMonster.requiredWords)
 
-  spriteAnimation = createSpriteAnimation({
-    canvas: spriteAnimation.canvas,
+  monsterAnimation = createMonsterAnimation({
+    canvas: monsterAnimation.canvas,
     scale: 5,
     monster: currentMonster,
-    onWalkComplete: spriteAnimation.onWalkComplete,
-    onStateChange: spriteAnimation.onStateChange,
+    onWalkComplete: monsterAnimation.onWalkComplete,
+    onStateChange: monsterAnimation.onStateChange,
   })
 
   initiateAttackSequence()
 }
 
-let attackInProgress = false
-
 function initiateAttackSequence() {
   if (attackInterval) clearInterval(attackInterval)
 
   attackInterval = setInterval(() => {
-    spriteAnimation.changeState("attack")
+    monsterAnimation.changeState("attack")
     attackInProgress = true
   }, currentMonster.attack.time)
 }
 
-function createSpriteAnimation(options) {
+function createMonsterAnimation(options) {
   const animation = {
     walk: {
       image: new Image(),
@@ -1013,7 +959,6 @@ function createSpriteAnimation(options) {
       if (animation.currentFrame === animation.cols - 1) {
         this.reset()
         this.changeState("hidden")
-        createNewMonster()
       }
     } else if (animation.state === "attack") {
       if (animation.currentFrame === animation.cols - 1) {
@@ -1030,6 +975,10 @@ function createSpriteAnimation(options) {
       this.changeState("hidden")
     } else if (cycleTime < 1250) {
       this.changeState("walk")
+      if (player.state === "attack") {
+        animation.cycleStartTime = currentTime
+        return
+      }
       const walkProgress = (cycleTime - 500) / animation.walkDuration
       animation.position.x = 1.2 - 0.3 * walkProgress
     } else if (cycleTime < 2000) {
@@ -1093,17 +1042,16 @@ function createSpriteAnimation(options) {
       case "idle":
         this.currentImage = this.idle.image
         this.cols = this.idle.cols
+        this.refresh()
         if (attackInProgress) {
-          hp -= currentMonster.attack.dmg
+          currentPlayer.hp -= currentMonster.attack.dmg
 
-          updateHP(hp)
-          console.log(`Attacked! HP remaining: ${hp}`)
+          updateHP(currentPlayer.hp)
           attackInProgress = false
 
-          if (hp <= 0) {
+          if (currentPlayer.hp <= 0) {
             saveScore(points)
-            hp = 100
-            console.log("Game Over!")
+            currentPlayer.hp = 100
             clearInterval(attackInterval)
             showGameOver(points)
             updatePoints(0)
@@ -1151,6 +1099,7 @@ function createSpriteAnimation(options) {
 
 const currentPlayer = {
   type: "Knight",
+  hp: 100,
   walk: {
     image: new Image(),
     cols: 8,
@@ -1159,7 +1108,7 @@ const currentPlayer = {
   idleColSize: 7,
   hitColSize: 4,
   deathColSize: 12,
-  attackColSize: 7,
+  attackColSize: [7, 6, 7],
 }
 
 function createPlayerAnimation(options) {
@@ -1180,10 +1129,20 @@ function createPlayerAnimation(options) {
       image: new Image(),
       cols: options.character.deathColSize,
     },
-    attack: {
-      image: new Image(),
-      cols: options.character.attackColSize,
-    },
+    attack: [
+      {
+        image: new Image(),
+        cols: options.character.attackColSize[0],
+      },
+      {
+        image: new Image(),
+        cols: options.character.attackColSize[1],
+      },
+      {
+        image: new Image(),
+        cols: options.character.attackColSize[2],
+      },
+    ],
     currentImage: null,
     cols: options.character.walkColSize || 4,
     scale: options.scale || 4,
@@ -1199,13 +1158,26 @@ function createPlayerAnimation(options) {
     },
     state: "walk",
     stateTime: 0,
+    attackCount: 0,
   }
 
   animation.walk.image.src = `sprites/${animation.type}/Run.png`
   animation.idle.image.src = `sprites/${animation.type}/Idle.png`
   animation.hit.image.src = `sprites/${animation.type}/Take_Hit.png`
   animation.death.image.src = `sprites/${animation.type}/Death.png`
-  animation.attack.image.src = `sprites/${animation.type}/Attack.png`
+
+  let attackAnimationArray = []
+  for (let i = 0; i < options.character.attackColSize.length; i++) {
+    attackAnimationArray.push({
+      image: new Image(),
+      cols: options.character.attackColSize[i],
+    })
+    attackAnimationArray[i].image.src = `sprites/${animation.type}/Attack_${
+      i + 1
+    }.png`
+  }
+
+  animation.attack = attackAnimationArray
 
   animation.currentImage = animation.walk.image
   animation.walk.image.onload = function () {
@@ -1214,26 +1186,31 @@ function createPlayerAnimation(options) {
   }
 
   animation.update = function () {
+    switch (animation.state) {
+      case "death":
+        if (this.currentFrame === this.cols - 1) {
+          this.reset()
+          this.changeState("hidden")
+        }
+        break
+      case "attack":
+        if (this.currentFrame === this.cols - 1) {
+          this.refresh()
+          this.changeState("idle")
+        }
+        break
+      case "hit":
+        if (this.currentFrame === this.cols - 1) {
+          this.changeState("idle")
+        }
+        break
+      default:
+        break
+    }
     this.framesDrawn++
     if (this.framesDrawn > msPerFrame) {
       this.currentFrame = (this.currentFrame + 1) % this.cols
       this.framesDrawn = 0
-    }
-
-    if (animation.state === "death") {
-      if (animation.currentFrame === animation.cols - 1) {
-        this.reset()
-        this.changeState("hidden")
-      }
-    } else if (animation.state === "attack") {
-      if (animation.currentFrame === animation.cols - 1) {
-        this.refresh()
-        this.changeState("idle")
-      }
-    } else if (animation.state === "hit") {
-      if (animation.currentFrame === animation.cols - 1) {
-        this.changeState("idle")
-      }
     }
   }
 
@@ -1262,21 +1239,14 @@ function createPlayerAnimation(options) {
     )
   }
 
-  animation.reset = function () {
-    this.framesDrawn = 0
-    this.currentFrame = 0
-    this.cycleStartTime = 0
-  }
-
   animation.refresh = function () {
     this.framesDrawn = 0
     this.currentFrame = 0
   }
 
   animation.changeState = function (state) {
-    if (this.state === state) return
+    if (this.state === state && state !== "attack") return
 
-    this.state = state
     switch (state) {
       case "walk":
         this.currentImage = this.walk.image
@@ -1287,7 +1257,7 @@ function createPlayerAnimation(options) {
         this.cols = this.idle.cols
         break
       case "hit":
-        if (state !== "attack") {
+        if (this.state !== "attack") {
           this.currentImage = this.hit.image
           this.cols = this.hit.cols
           this.refresh()
@@ -1296,18 +1266,20 @@ function createPlayerAnimation(options) {
       case "death":
         this.currentImage = this.death.image
         this.cols = this.death.cols
-        this.reset()
+        this.refresh()
         break
       case "attack":
-        this.currentImage = this.attack.image
-        this.cols = this.attack.cols
+        this.currentImage = this.attack[this.attackCount].image
+        this.cols = this.attack[this.attackCount].cols
         this.refresh()
+        this.attackCount = (this.attackCount + 1) % 3
         break
       case "hidden":
         this.currentImage = this.walk.image
         this.cols = this.walk.cols
         break
     }
+    this.state = state
 
     this.spriteWidth = this.currentImage.width / this.cols
     this.spriteHeight = this.currentImage.height
@@ -1359,16 +1331,6 @@ function createWordDisplay() {
 
   const wordContainer = document.getElementById("wordContainer")
   wordContainer.appendChild(wordDisplay)
-
-  /*
-  const monsterX = 0.18 * spriteAnimation.canvas.width;
-  const monsterY = 1.18 * spriteAnimation.canvas.height;
-
-  wordDisplay.style.left = `${monsterX + 50}px`;
-  wordDisplay.style.top = `${
-    monsterY - spriteAnimation.spriteHeight * spriteAnimation.scale
-  }px`;
-  */
 }
 
 function updateWordDisplay() {
@@ -1416,7 +1378,12 @@ function handleKeyPress(event) {
       player.changeState("attack")
 
       if (wordsTyped === words.length) {
-        spriteAnimation.changeState("death")
+        monsterAnimation.changeState("death")
+        if (currentMonster.type === "Mushroom") {
+          currentPlayer.hp = Math.min(currentPlayer.hp + 5, 100)
+          updateHP(currentPlayer.hp)
+          showHealingEffect()
+        }
         wordsTyped = 0
         currentInputIndex = 0
         currentWord = words[wordsTyped]
@@ -1426,7 +1393,7 @@ function handleKeyPress(event) {
         currentWord = words[wordsTyped]
         showNewWord()
       }
-      spriteAnimation.changeState("hit")
+      monsterAnimation.changeState("hit")
     }
   }
 }
@@ -1434,6 +1401,45 @@ function handleKeyPress(event) {
 function resetWordContainer() {
   const wordContainer = document.getElementById("wordContainer")
   wordContainer.innerHTML = ""
+}
+
+function showHealingEffect() {
+  const healingEffect = document.createElement("div")
+  healingEffect.style.position = "absolute"
+  healingEffect.style.top = "50%"
+  healingEffect.style.left = "50%"
+  healingEffect.style.transform = "translate(-50%, -50%)"
+  healingEffect.style.fontSize = "48px"
+  healingEffect.style.fontFamily = "Alagard"
+  healingEffect.style.color = "#4a9668"
+  healingEffect.style.textShadow = `
+    2px 2px 0 #1d3b2a,
+    -2px 2px 0 #1d3b2a,
+    2px -2px 0 #1d3b2a,
+    -2px -2px 0 #1d3b2a
+  `
+  healingEffect.textContent = "+5 HP"
+
+  document.body.appendChild(healingEffect)
+
+  let opacity = 1
+  let scale = 1
+
+  const animate = () => {
+    opacity -= 0.01
+    scale += 0.01
+
+    healingEffect.style.opacity = opacity
+    healingEffect.style.transform = `translate(-50%, -50%) scale(${scale})`
+
+    if (opacity > 0) {
+      requestAnimationFrame(animate)
+    } else {
+      healingEffect.remove()
+    }
+  }
+
+  requestAnimationFrame(animate)
 }
 
 function ParallaxScene() {
@@ -1454,21 +1460,26 @@ function ParallaxScene() {
     character: currentPlayer,
   })
 
-  spriteAnimation = createSpriteAnimation({
+  monsterAnimation = createMonsterAnimation({
     canvas: canvas,
     scale: 5,
     monster: currentMonster,
     onStateChange: (newState) => {
       if (newState === "idle") {
-        player.changeState("idle")
-        layers.forEach((layer) => {
-          layer.isMoving = false
-        })
+        if (player.state === "walk") {
+          player.changeState("idle")
+          layers.forEach((layer) => {
+            layer.isMoving = false
+          })
+        }
       } else if (newState === "hidden") {
-        player.changeState("walk")
-        layers.forEach((layer) => {
-          layer.isMoving = true
-        })
+        setTimeout(() => {
+          player.changeState("walk")
+          layers.forEach((layer) => {
+            layer.isMoving = true
+          })
+          createNewMonster()
+        }, 500)
       }
     },
     onWalkComplete: createWordDisplay,
@@ -1494,9 +1505,9 @@ function ParallaxScene() {
       layer.draw(ctx)
     })
     player.update(currentTime)
-    spriteAnimation.update(currentTime)
+    monsterAnimation.update(currentTime)
     player.draw()
-    spriteAnimation.draw()
+    monsterAnimation.draw()
 
     requestAnimationFrame(animate)
   }
@@ -1545,22 +1556,19 @@ function updateHP(currentHP, maxHP = 100) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  if (localStorage.getItem("isAllowed") !== "true") {
+    window.location.href = "index.html"
+  }
+  localStorage.setItem("isAllowed", "false")
+
   ParallaxScene()
   initiateAttackSequence()
   window.addEventListener("keypress", handleKeyPress)
 
-  let currentHP = hp
-  Object.defineProperty(window, "hp", {
-    get: function () {
-      return currentHP
-    },
-    set: function (value) {
-      currentHP = Math.max(0, Math.min(value, 100))
-      updateHP(currentHP)
-      return currentHP
-    },
+  updateHP(currentPlayer.hp)
+  pointsDisplay = document.getElementById("pointsValue")
+  detectRefreshRate((fps) => {
+    localStorage.setItem("refresh-rate", fps.toFixed(0))
   })
-
-  updateHP(hp)
-  pointsDisplay = createPointsDisplay()
+  msPerFrame = localStorage.getItem("refresh-rate") > 100 ? 15 : 7
 })

@@ -194,3 +194,22 @@ body {
 .modal button:hover {
   background-color: #8b1916;
 }
+
+.github-link {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  color: #ecd9b9;
+  text-decoration: none;
+  font-size: 1.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #27221b;
+  border-radius: 4px;
+  box-shadow: 0px 0px 0px 2px #3d3327;
+  transition: transform 0.2s;
+  z-index: 100;
+}
+
+.github-link:hover {
+  transform: translateY(-2px);
+}

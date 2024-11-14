@@ -1,4 +1,3 @@
-// Score management
 class ScoreManager {
   constructor() {
     this.scores = this.loadScores()
@@ -49,6 +48,7 @@ function showUsernameModal() {
 function startGame() {
   const username = localStorage.getItem("typequest-current-user")
   if (username) {
+    localStorage.setItem("isAllowed", "true")
     window.location.href = "game.html"
   } else {
     showUsernameModal()
@@ -64,20 +64,8 @@ function setUsername() {
   }
 }
 
-// Example of how to save a score (call this from game.html when game ends)
-function saveScore(score) {
-  const username = localStorage.getItem("typequest-current-user")
-  if (username) {
-    scoreManager.saveScore(username, score)
-  }
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   checkUsername()
-
-  detectRefreshRate((fps) => {
-    localStorage.setItem("refresh-rate", fps.toFixed(0))
-  })
 })
 
 document.getElementById("play-btn").addEventListener("click", startGame)
@@ -101,23 +89,3 @@ document.getElementById("usernameModal").addEventListener("click", (e) => {
     e.target.style.display = "none"
   }
 })
-
-function detectRefreshRate(callback) {
-  let start, end
-  let frameCount = 0
-
-  function frame() {
-    if (frameCount === 0) {
-      start = performance.now()
-    } else if (frameCount === 60) {
-      end = performance.now()
-      const fps = 1000 / ((end - start) / 60)
-      callback(fps)
-      return
-    }
-    frameCount++
-    requestAnimationFrame(frame)
-  }
-
-  requestAnimationFrame(frame)
-}
