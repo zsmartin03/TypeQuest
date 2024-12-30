@@ -213,3 +213,29 @@ body {
 .github-link:hover {
   transform: translateY(-2px);
 }
+
+#logout-btn {
+  font-family: "Alagard";
+  font-size: 1.25rem;
+  padding: 0.5rem 2rem;
+  background-color: #27221b;
+  color: #ecd9b9;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.1s;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0px 0px 0px 2px #3d3327, -2px -2px 0px 2px #3d3327,
+    2px -2px 0px 2px #3d3327, -2px 2px 0px 2px #3d3327, 2px 2px 0px 2px #3d3327,
+    -4px -4px 0px 2px #1c1714, 4px -4px 0px 2px #1c1714,
+    -4px 4px 0px 2px #1c1714, 4px 4px 0px 2px #1c1714;
+}
+
+#logout-btn:hover {
+  transform: translateY(-2px);
+}
+
+#logout-btn:active {
+  transform: translateY(2px);
+}

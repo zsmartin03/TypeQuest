@@ -1,38 +1,6 @@
-class ScoreManager {
-  constructor() {
-    this.scores = this.loadScores()
-  }
-
-  loadScores() {
-    const scores = localStorage.getItem("typequest-scores")
-    return scores ? JSON.parse(scores) : []
-  }
-
-  updateScoreboardDisplay() {
-    const tableBody = document.getElementById("scoreTableBody")
-    tableBody.innerHTML = ""
-
-    this.scores.forEach((score, index) => {
-      const row = document.createElement("tr")
-      const date = new Date(score.date)
-      row.innerHTML = `
-              <td>${index + 1}</td>
-              <td>${score.username}</td>
-              <td>${score.score}</td>
-              <td>${date.toLocaleDateString()}</td>
-            `
-      tableBody.appendChild(row)
-    })
-  }
-}
-
-const scoreManager = new ScoreManager()
-scoreManager.updateScoreboardDisplay()
-
 function detectRefreshRate(callback) {
   let start, end
   let frameCount = 0
-
   function frame() {
     if (frameCount === 0) {
       start = performance.now()
@@ -45,70 +13,83 @@ function detectRefreshRate(callback) {
     frameCount++
     requestAnimationFrame(frame)
   }
-
   requestAnimationFrame(frame)
 }
 
-function checkUsername() {
-  const username = localStorage.getItem("typequest-current-user")
-  if (!username) {
-    showUsernameModal()
-  } else {
-    document.getElementById("currentUsername").textContent = username
-  }
-}
-
-function showUsernameModal() {
-  const modal = document.getElementById("usernameModal")
-  modal.style.display = "flex"
-  document.getElementById("usernameInput").value =
-    localStorage.getItem("typequest-current-user") || ""
-}
-
 function startGame() {
-  const username = localStorage.getItem("typequest-current-user")
-  if (username) {
-    localStorage.setItem("isAllowed", "true")
-    window.location.href = "game.html"
-  } else {
-    showUsernameModal()
-  }
+  localStorage.setItem("isAllowed", "true")
+  window.location.href = "game.php"
 }
 
-function setUsername() {
-  const username = document.getElementById("usernameInput").value.trim()
-  if (username) {
-    localStorage.setItem("typequest-current-user", username)
-    document.getElementById("currentUsername").textContent = username
-    document.getElementById("usernameModal").style.display = "none"
-  }
+function showAuthModal() {
+  const modal = document.getElementById("authModal")
+  modal.style.display = "flex"
+
+  const urlParams = new URLSearchParams(window.location.search)
+  const error = urlParams.get("error")
+
+  const showRegister = [
+    "passwords_dont_match",
+    "username_taken",
+    "registration_failed",
+  ].includes(error)
+
+  document.getElementById("loginForm").style.display = showRegister
+    ? "none"
+    : "block"
+  document.getElementById("registerForm").style.display = showRegister
+    ? "block"
+    : "none"
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  checkUsername()
   detectRefreshRate((fps) => {
     localStorage.setItem("refresh-rate", fps.toFixed(0))
   })
-})
 
-document.getElementById("play-btn").addEventListener("click", startGame)
-
-document
-  .getElementById("change-username-btn")
-  .addEventListener("click", showUsernameModal)
-
-document.getElementById("usernameInput").addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
-    setUsername()
+  const playBtn = document.getElementById("play-btn")
+  if (playBtn) {
+    playBtn.addEventListener("click", startGame)
   }
-})
 
-document
-  .getElementById("set-username-btn")
-  .addEventListener("click", setUsername)
+  const showRegisterLink = document.getElementById("showRegister")
+  if (showRegisterLink) {
+    showRegisterLink.addEventListener("click", (e) => {
+      e.preventDefault()
+      document.getElementById("loginForm").style.display = "none"
+      document.getElementById("registerForm").style.display = "block"
+      const url = new URL(window.location.href)
+      url.searchParams.delete("error")
+      window.history.replaceState({}, "", url)
+    })
+  }
 
-document.getElementById("usernameModal").addEventListener("click", (e) => {
-  if (e.target.id === "usernameModal") {
-    e.target.style.display = "none"
+  const showLoginLink = document.getElementById("showLogin")
+  if (showLoginLink) {
+    showLoginLink.addEventListener("click", (e) => {
+      e.preventDefault()
+      document.getElementById("loginForm").style.display = "block"
+      document.getElementById("registerForm").style.display = "none"
+      const url = new URL(window.location.href)
+      url.searchParams.delete("error")
+      window.history.replaceState({}, "", url)
+    })
+  }
+
+  const authModal = document.getElementById("authModal")
+  if (authModal) {
+    authModal.addEventListener("click", (e) => {
+      const isLoggedIn =
+        document.querySelector(".username-display .username-text") !== null
+
+      if (e.target === authModal && isLoggedIn) {
+        authModal.style.display = "none"
+      }
+    })
+  }
+
+  const urlParams = new URLSearchParams(window.location.search)
+  if (urlParams.has("error")) {
+    showAuthModal()
   }
 })

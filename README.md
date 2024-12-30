@@ -1,6 +1,6 @@
 # TypeQuest
 
-Simple typing game made in HTML + CSS + JS.
+Simple typing game developed in PHP, JavaScript and CSS.
 Available at: https://zsolnaim.web.elte.hu/TypeQuest/
 
 Sprites/backgrounds used: \

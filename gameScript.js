@@ -554,27 +554,6 @@ const monsters = [
   },
 ]
 
-function getCurrentUsername() {
-  return localStorage.getItem("typequest-current-user") || "Guest"
-}
-
-function saveScore(score) {
-  const username = getCurrentUsername()
-  const currentDate = new Date().toISOString()
-
-  let scores = JSON.parse(localStorage.getItem("typequest-scores") || "[]")
-
-  scores.push({
-    username,
-    score,
-    date: currentDate,
-  })
-
-  scores.sort((a, b) => b.score - a.score)
-
-  localStorage.setItem("typequest-scores", JSON.stringify(scores))
-}
-
 function updatePoints(value) {
   points = value
   if (pointsDisplay) {
@@ -624,7 +603,7 @@ function showGameOver(finalScore) {
   gameOverContainer.style.top = "50%"
   gameOverContainer.style.left = "50%"
   gameOverContainer.style.transform = "translate(-50%, -50%)"
-  gameOverContainer.style.backgroundColor = "#14110F" // Darker shade for the background
+  gameOverContainer.style.backgroundColor = "#14110F"
   gameOverContainer.style.padding = "20px 40px"
   gameOverContainer.style.textAlign = "center"
   gameOverContainer.style.fontFamily = "Alagard"
@@ -640,143 +619,134 @@ function showGameOver(finalScore) {
     -4px 4px 0px 2px #27221b,
     4px 4px 0px 2px #27221b
   `
+  saveScore(finalScore)
+    .then(() => {
+      const gameOverTitle = document.createElement("h1")
+      gameOverTitle.textContent = "Game Over"
+      gameOverTitle.style.color = "#ed4c4a"
+      gameOverTitle.style.fontSize = "48px"
+      gameOverTitle.style.marginBottom = "20px"
+      gameOverTitle.style.textShadow = `
+      2px 2px 0 #000,
+      -2px 2px 0 #000,
+      2px -2px 0 #000,
+      -2px -2px 0 #000
+    `
 
-  const gameOverTitle = document.createElement("h1")
-  gameOverTitle.textContent = "Game Over"
-  gameOverTitle.style.color = "#ed4c4a"
-  gameOverTitle.style.fontSize = "48px"
-  gameOverTitle.style.marginBottom = "20px"
-  gameOverTitle.style.textShadow = `
-    2px 2px 0 #000,
-    -2px 2px 0 #000,
-    2px -2px 0 #000,
-    -2px -2px 0 #000
-  `
+      const scoreText = document.createElement("p")
+      scoreText.textContent = `Final Score: ${finalScore}`
+      scoreText.style.color = "#ECD9B9"
+      scoreText.style.fontSize = "32px"
+      scoreText.style.marginBottom = "20px"
+      scoreText.style.textShadow = `
+      2px 2px 0 #000,
+      -2px 2px 0 #000,
+      2px -2px 0 #000,
+      -2px -2px 0 #000
+    `
 
-  const scoreText = document.createElement("p")
-  scoreText.textContent = `Final Score: ${finalScore}`
-  scoreText.style.color = "#ECD9B9"
-  scoreText.style.fontSize = "32px"
-  scoreText.style.marginBottom = "20px"
-  scoreText.style.textShadow = `
-    2px 2px 0 #000,
-    -2px 2px 0 #000,
-    2px -2px 0 #000,
-    -2px -2px 0 #000
-  `
+      const playAgainButton = document.createElement("button")
+      playAgainButton.textContent = "Play Again"
+      playAgainButton.style.fontFamily = "Alagard"
+      playAgainButton.style.fontSize = "24px"
+      playAgainButton.style.padding = "10px 20px"
+      playAgainButton.style.marginRight = "15px"
+      playAgainButton.style.backgroundColor = "#4a9668"
+      playAgainButton.style.color = "#ECD9B9"
+      playAgainButton.style.border = "none"
+      playAgainButton.style.cursor = "pointer"
+      playAgainButton.style.textShadow = `
+      2px 2px 0 #1d3b2a,
+      -2px 2px 0 #1d3b2a,
+      2px -2px 0 #1d3b2a,
+      -2px -2px 0 #1d3b2a
+    `
+      playAgainButton.style.boxShadow = `
+      0px 0px 0px 2px #3d3327,
+      -2px -2px 0px 2px #3d3327,
+      2px -2px 0px 2px #3d3327,
+      -2px 2px 0px 2px #3d3327,
+      2px 2px 0px 2px #3d3327
+    `
 
-  const username = getCurrentUsername()
-  const usernameText = document.createElement("p")
-  usernameText.textContent = `Played as: ${username}`
-  usernameText.style.color = "#ECD9B9"
-  usernameText.style.fontSize = "24px"
-  usernameText.style.marginBottom = "30px"
-  usernameText.style.textShadow = `
-    2px 2px 0 #000,
-    -2px 2px 0 #000,
-    2px -2px 0 #000,
-    -2px -2px 0 #000
-  `
+      playAgainButton.addEventListener("mouseover", () => {
+        playAgainButton.style.backgroundColor = "#5db37e"
+      })
 
-  const playAgainButton = document.createElement("button")
-  playAgainButton.textContent = "Play Again"
-  playAgainButton.style.fontFamily = "Alagard"
-  playAgainButton.style.fontSize = "24px"
-  playAgainButton.style.padding = "10px 20px"
-  playAgainButton.style.marginRight = "15px"
-  playAgainButton.style.backgroundColor = "#4a9668"
-  playAgainButton.style.color = "#ECD9B9"
-  playAgainButton.style.border = "none"
-  playAgainButton.style.cursor = "pointer"
-  playAgainButton.style.textShadow = `
-    2px 2px 0 #1d3b2a,
-    -2px 2px 0 #1d3b2a,
-    2px -2px 0 #1d3b2a,
-    -2px -2px 0 #1d3b2a
-  `
-  playAgainButton.style.boxShadow = `
-    0px 0px 0px 2px #3d3327,
-    -2px -2px 0px 2px #3d3327,
-    2px -2px 0px 2px #3d3327,
-    -2px 2px 0px 2px #3d3327,
-    2px 2px 0px 2px #3d3327
-  `
+      playAgainButton.addEventListener("mouseout", () => {
+        playAgainButton.style.backgroundColor = "#4a9668"
+      })
 
-  playAgainButton.addEventListener("mouseover", () => {
-    playAgainButton.style.backgroundColor = "#5db37e"
-  })
+      playAgainButton.addEventListener("click", () => {
+        currentPlayer.hp = 100
+        localStorage.setItem("isAllowed", "true")
+        location.reload()
+      })
 
-  playAgainButton.addEventListener("mouseout", () => {
-    playAgainButton.style.backgroundColor = "#4a9668"
-  })
+      const backButton = document.createElement("button")
+      backButton.textContent = "Back to Menu"
+      backButton.style.fontFamily = "Alagard"
+      backButton.style.fontSize = "24px"
+      backButton.style.padding = "10px 20px"
+      backButton.style.marginLeft = "15px"
+      backButton.style.backgroundColor = "#8b3c3a"
+      backButton.style.color = "#ECD9B9"
+      backButton.style.border = "none"
+      backButton.style.cursor = "pointer"
+      backButton.style.textShadow = `
+      2px 2px 0 #4b1918,
+      -2px 2px 0 #4b1918,
+      2px -2px 0 #4b1918,
+      -2px -2px 0 #4b1918
+    `
+      backButton.style.boxShadow = `
+      0px 0px 0px 2px #3d3327,
+      -2px -2px 0px 2px #3d3327,
+      2px -2px 0px 2px #3d3327,
+      -2px 2px 0px 2px #3d3327,
+      2px 2px 0px 2px #3d3327
+    `
 
-  playAgainButton.addEventListener("click", () => {
-    localStorage.setItem("isAllowed", "true")
-    location.reload()
-  })
+      backButton.addEventListener("mouseover", () => {
+        backButton.style.backgroundColor = "#a64c4a"
+      })
 
-  // Back Button
-  const backButton = document.createElement("button")
-  backButton.textContent = "Back to Menu"
-  backButton.style.fontFamily = "Alagard"
-  backButton.style.fontSize = "24px"
-  backButton.style.padding = "10px 20px"
-  backButton.style.marginLeft = "15px"
-  backButton.style.backgroundColor = "#8b3c3a"
-  backButton.style.color = "#ECD9B9"
-  backButton.style.border = "none"
-  backButton.style.cursor = "pointer"
-  backButton.style.textShadow = `
-    2px 2px 0 #4b1918,
-    -2px 2px 0 #4b1918,
-    2px -2px 0 #4b1918,
-    -2px -2px 0 #4b1918
-  `
-  backButton.style.boxShadow = `
-    0px 0px 0px 2px #3d3327,
-    -2px -2px 0px 2px #3d3327,
-    2px -2px 0px 2px #3d3327,
-    -2px 2px 0px 2px #3d3327,
-    2px 2px 0px 2px #3d3327
-  `
+      backButton.addEventListener("mouseout", () => {
+        backButton.style.backgroundColor = "#8b3c3a"
+      })
 
-  backButton.addEventListener("mouseover", () => {
-    backButton.style.backgroundColor = "#a64c4a"
-  })
+      backButton.addEventListener("click", () => {
+        window.location.href = "index.php"
+      })
 
-  backButton.addEventListener("mouseout", () => {
-    backButton.style.backgroundColor = "#8b3c3a"
-  })
+      const scanlines = document.createElement("div")
+      scanlines.style.position = "absolute"
+      scanlines.style.top = "0"
+      scanlines.style.left = "0"
+      scanlines.style.width = "100%"
+      scanlines.style.height = "100%"
+      scanlines.style.backgroundImage = `
+      linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 50%,
+        transparent 100%
+      )
+    `
+      scanlines.style.backgroundSize = "100% 4px"
+      scanlines.style.pointerEvents = "none"
 
-  backButton.addEventListener("click", () => {
-    window.location.href = "index.html	"
-  })
-
-  const scanlines = document.createElement("div")
-  scanlines.style.position = "absolute"
-  scanlines.style.top = "0"
-  scanlines.style.left = "0"
-  scanlines.style.width = "100%"
-  scanlines.style.height = "100%"
-  scanlines.style.backgroundImage = `
-    linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.1) 50%,
-      transparent 50%,
-      transparent 100%
-    )
-  `
-  scanlines.style.backgroundSize = "100% 4px"
-  scanlines.style.pointerEvents = "none"
-
-  gameOverContainer.appendChild(gameOverTitle)
-  gameOverContainer.appendChild(scoreText)
-  gameOverContainer.appendChild(usernameText)
-  gameOverContainer.appendChild(playAgainButton)
-  gameOverContainer.appendChild(backButton) // Add the Back button
-  gameOverContainer.appendChild(scanlines)
-  document.body.appendChild(gameOverContainer)
+      gameOverContainer.appendChild(gameOverTitle)
+      gameOverContainer.appendChild(scoreText)
+      gameOverContainer.appendChild(playAgainButton)
+      gameOverContainer.appendChild(backButton)
+      gameOverContainer.appendChild(scanlines)
+      document.body.appendChild(gameOverContainer)
+    })
+    .catch((error) => {
+      console.error("Failed to save score:", error)
+    })
 }
 
 let currentMonster = monsters[Math.floor(Math.random() * monsters.length)]
@@ -943,7 +913,9 @@ function createMonsterAnimation(options) {
     } else if (animation.state === "attack") {
       if (animation.currentFrame === animation.cols - 1) {
         this.changeState("idle")
-        player.changeState("hit")
+        if (currentPlayer.hp > 0) {
+          player.changeState("hit")
+        }
         this.refresh()
       }
     } else if (animation.state === "hit") {
@@ -1030,9 +1002,10 @@ function createMonsterAnimation(options) {
           attackInProgress = false
 
           if (currentPlayer.hp <= 0) {
-            saveScore(points)
-            currentPlayer.hp = 100
+            player.changeState("death")
             clearInterval(attackInterval)
+            resetWordContainer()
+
             showGameOver(points)
             updatePoints(0)
           }
@@ -1169,7 +1142,7 @@ function createPlayerAnimation(options) {
     switch (animation.state) {
       case "death":
         if (this.currentFrame === this.cols - 1) {
-          this.reset()
+          this.refresh()
           this.changeState("hidden")
         }
         break
@@ -1263,6 +1236,8 @@ function createPlayerAnimation(options) {
 
     this.spriteWidth = this.currentImage.width / this.cols
     this.spriteHeight = this.currentImage.height
+
+    console.log(animation.state)
   }
 
   return animation
@@ -1291,12 +1266,10 @@ function createWordDisplay() {
   scanlines.style.backgroundSize = "100% 4px"
   scanlines.style.pointerEvents = "none"
 
-  //container for the letters to layer them above the scanlines
   const letterContainer = document.createElement("div")
   letterContainer.style.position = "relative"
   letterContainer.style.zIndex = "1"
 
-  // letter spans with appropriate styling
   currentWord.split("").forEach((char) => {
     const charSpan = document.createElement("span")
     charSpan.innerText = char
@@ -1536,11 +1509,6 @@ function updateHP(currentHP, maxHP = 100) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (localStorage.getItem("isAllowed") !== "true") {
-    window.location.href = "index.html"
-  }
-  localStorage.setItem("isAllowed", "false")
-
   ParallaxScene()
   initiateAttackSequence()
   window.addEventListener("keypress", handleKeyPress)
